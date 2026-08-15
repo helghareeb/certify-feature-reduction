@@ -5,9 +5,9 @@
 # bibliography is INLINED in main.tex, so NO .bib ships (a leftover .bib beside an inlined
 # bibliography is the known-confusing case). wlscirep.cls requires the jabbrv trio, which the
 # SR compiler does not provide -- bundled. Regenerate all table fragments and figures FIRST
-# (make_figures / meta_analysis / meta_analysis_k / safe_budget / worked_example /
+# (make_figures / make_enrichment_figures / meta_analysis / meta_analysis_k / safe_budget / worked_example /
 # subsample_agreement / ranking_stability) so the package reflects the committed results (R1/R2).
-# Run from paper/. Output: submission_revision/ + ns-clinical-fs_SR_revision.zip + acid test.
+# Run from paper/. Output: submission_revision/ + certify-feature-reduction_SR_revision.zip + acid test.
 set -euo pipefail
 cd "$(dirname "$0")"
 OUT=submission_revision
@@ -39,14 +39,14 @@ echo "packaged $(echo "$TABLES" | wc -w) table fragment(s), $(echo "$FIGS" | wc 
 cp response_to_reviewers.pdf "$OUT"/
 cp cover_letter.pdf cover_letter.txt "$OUT"/
 
-( cd "$OUT" && rm -f ../ns-clinical-fs_SR_revision.zip && \
-  python -c "import shutil; shutil.make_archive('../ns-clinical-fs_SR_revision','zip','.')" )
+( cd "$OUT" && rm -f ../certify-feature-reduction_SR_revision.zip && \
+  python -c "import shutil; shutil.make_archive('../certify-feature-reduction_SR_revision','zip','.')" )
 
 # Acid test: compile the package from a CLEAN extract with NO local TeX tree visible.
 # (cygpath: Windows Python does not understand Git Bash /tmp paths -- translation is mandatory.)
 ACID=$(mktemp -d)
 ACIDW=$(cygpath -w "$ACID" 2>/dev/null || echo "$ACID")
-python -c "import shutil,sys; shutil.unpack_archive('ns-clinical-fs_SR_revision.zip', r'''$ACIDW''')"
+python -c "import shutil,sys; shutil.unpack_archive('certify-feature-reduction_SR_revision.zip', r'''$ACIDW''')"
 ( cd "$ACID" && TEXMFHOME=/nonexistent pdflatex -interaction=nonstopmode -halt-on-error main.tex >log1 2>&1 \
   && TEXMFHOME=/nonexistent pdflatex -interaction=nonstopmode -halt-on-error main.tex >log2 2>&1 \
   && TEXMFHOME=/nonexistent pdflatex -interaction=nonstopmode -halt-on-error main.tex >log3 2>&1 )

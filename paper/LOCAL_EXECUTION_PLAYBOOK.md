@@ -44,6 +44,7 @@ skipped by expected row count; shard writes are atomic. Full-burn totals: 87 + 2
 | worked example: tables + decision-curve/flip-CDF/reliability figures | `python experiments/worked_example.py` |
 | subsample-agreement table | `python experiments/subsample_agreement.py` |
 | selection-stability figure (stability_harm.pdf) | `python experiments/ranking_stability.py --workers 6` (~40 min first run; cached parquet thereafter) |
+| the three enrichment figures (recalibration ladder, cross-axis matrix, probe-injection dose-response) | `python experiments/make_enrichment_figures.py` (~5 s; committed CSVs only, fits nothing) |
 | cover letter plain-text version, generated from the .tex so the two cannot drift | `python experiments/mk_cover_txt.py` (run 2026-08-15; writes `paper/cover_letter.txt`, no manuscript number) |
 | public-compendium sync check (no manuscript number; `--check` exits non-zero if normalisation is due) | `python scripts/sync_public.py --check` (run 2026-08-16) |
 | v1-vs-v2 invariance report | `python experiments/v1_v2_diff.py` |

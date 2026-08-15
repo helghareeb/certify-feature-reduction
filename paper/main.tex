@@ -814,6 +814,21 @@ true features, while the full model degrades as the noise accumulates---so the g
 by a dataset merely containing many irrelevant features, which is the intuition the high-dimensional
 arm was designed to test and which these data refute.
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.62\textwidth]{figures/probe_injection_dose.pdf}
+\caption{\textbf{Reduction defends against noise padding.} AUROC reduction penalty as pure-noise
+features drawn independently of the outcome are injected, with rows, true features, folds and the
+\emph{absolute} retained budget held fixed, so that the only quantity changing is the number of
+irrelevant features. Bands are \result{95\,\%} bootstrap intervals over \result{180} units per cell
+(\result{30} repetitions $\times$ \result{3} rankers $\times$ \result{2} learners). The
+pre-registered prediction was that dilution would raise the penalty. It falls to zero on cleveland,
+crosses into benefit on SPECTF, and does not move on mammographic---so the harm from aggressive
+reduction is not caused by a dataset merely containing many irrelevant features.}
+\label{fig:probedose}
+\end{figure}
+
+
 That refinement sharpens the account rather than dissolving it, and it explains the null above. What
 distinguishes arcene from prostate is not that arcene has more noise, but that its predictive signal is
 genuinely \emph{spread across many features}: reducing to a handful discards real signal, whereas
@@ -928,6 +943,20 @@ monotonically but is an order of magnitude smaller, as the final row shows.}
 \label{tab:ladder}
 \input{ladder_table}
 \end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.62\textwidth]{figures/recalibration_ladder.pdf}
+\caption{\textbf{Post-hoc recalibration repairs the probability scale in proportion to its
+flexibility, and repairs the ordering at no rung.} Recovery relative to the uncalibrated model at the
+full budget, over the identical \result{108}-cell grid at every rung, with recalibrators ordered by
+free parameters. Calibration-error recovery climbs monotonically to \result{27.8\,\%} of the
+uncalibrated baseline; selective-reliability recovery is flat-to-negative throughout, and clinical
+net benefit, though monotone, recovers an order of magnitude less. The gap between the two curves is
+the dissociation the paper reports, and it cannot be closed by choosing a more flexible recalibrator.}
+\label{fig:ladder}
+\end{figure}
+
 
 \begin{table}[t]
 \centering
@@ -1051,6 +1080,32 @@ relevant operating points.}
 \section{Discussion}
 \label{sec:discussion}
 
+\begin{algorithm}[t]
+\caption{\textsc{SupportDistanceConfidence}: a confidence signal the predicted probability never
+enters, used to separate the part of the selective-reliability penalty that is a property of the
+probability scale from the part that is not.}
+\label{alg:distconf}
+\begin{algorithmic}[1]
+\Require dataset $(X,y)$; folds $K$; neighbours $m$; the cached out-of-fold probabilities $p$ from
+  Algorithm~\ref{alg:certify} at each budget
+\Ensure a confidence $c\in\mathbb{R}^{n}$, and the reduction penalty measured under it
+\For{each fold $(\mathrm{tr},\mathrm{te})$}
+  \State $\mu,\sigma \gets \textsc{Mean}(X_{\mathrm{tr}}),\ \textsc{Std}(X_{\mathrm{tr}})$ \Comment{training rows only}
+  \State $Z_{\mathrm{tr}},Z_{\mathrm{te}} \gets (X_{\mathrm{tr}}-\mu)/\sigma,\ (X_{\mathrm{te}}-\mu)/\sigma$
+  \State $T \gets \textsc{BallTree}(Z_{\mathrm{tr}})$ \Comment{held-out rows are \emph{not} in the tree}
+  \For{each held-out row $i \in \mathrm{te}$}
+    \State $d_i \gets \tfrac{1}{m}\sum_{j\in\textsc{NearestNeighbours}(T, z_i, m)} \lVert z_i - z_j\rVert_2$
+    \State $c_i \gets -d_i$ \Comment{nearer the training support $\Rightarrow$ more confident}
+  \EndFor
+\EndFor
+\State \Return $c$, and $\mathrm{AURC}(y,p,c)$ at each budget
+\end{algorithmic}
+\textbf{Why this separates the two components.} $c$ is computed from $X$ alone, so it shares no
+functional form with $|p-0.5|$; and the full-feature and reduced models are compared under the
+\emph{same} $c$, so any surviving penalty cannot be an artefact of the confidence being a
+transformation of the quantity under test.
+\end{algorithm}
+
 The audit demonstrates, in plain terms, that good discrimination in a reduced model is not a reliable
 indicator of good calibration, of dependable confidence, or of preserved clinical utility---so
 discrimination alone cannot certify a reduced model as safe. Across twelve public clinical datasets, three learners,
@@ -1088,6 +1143,21 @@ That is the same division the recalibration ladder implies mechanically
 (Section~\ref{sec:recal})---recalibration repairs the scale and cannot repair an ordering---arriving
 here from a different direction, and it is why a single calibration number cannot stand in for the
 audit.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.56\textwidth]{figures/cross_axis_matrix.pdf}
+\caption{\textbf{The reliability axes are two groups, not one scale.} Spearman correlation of the
+aggressive-budget reduction penalty across all \result{108} dataset--ranker--learner cells, with every
+axis oriented so that positive means worse. Two blocks separate cleanly: quantities defined on the
+probability \emph{scale} (calibration error, selective calibration error) cohere at
+\result{$+0.97$}, quantities defined on the probability \emph{ordering} (selective reliability,
+conformal set size) cohere at \result{$+0.89$}, and the two blocks are nearly independent of each
+other (\result{$+0.30$}). Net benefit sits between them, as a decision rule that reads a calibrated
+probability at a threshold should. A single calibration number therefore cannot stand in for the
+audit.}
+\label{fig:crossaxis}
+\end{figure}
 
 \paragraph{Why selective reliability matters here.} AURC summarises whether a model's own
 confidence can be trusted to triage which predictions to act on. A reduced model with a larger

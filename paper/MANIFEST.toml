@@ -1,7 +1,7 @@
 # paper/MANIFEST.toml — the audit manifest (AUDIT_RULES.md, AUD-1..4).
 # Every substantive claim in the manuscript resolves to the code that earns it; every control
 # is a column that demonstrably varies; every unexercised script is declared, not silent.
-# Checked by the hub's scripts/audit_gate.py. Revision v2 (SR submission 2650209c).
+# Checked by the pre-submission audit gate. Revision v2 (SR submission 2650209c).
 
 [claims]  # AUD-3 / V3 — claim -> file:line that implements it. Adjectives are claims.
 "the budget rule k = max(1, round(frac*p)), with its >=1 floor and round-half-to-even, exactly as disclosed in Methods" = "src/nsclinfs/reduction.py:48"

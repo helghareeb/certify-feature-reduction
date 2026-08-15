@@ -3,7 +3,7 @@
 **Paper:** *Aggressive feature reduction degrades the selective reliability and clinical net benefit
 of clinical risk models* · Scientific Reports submission `2650209c-ff1e-4df4-aeb0-75ef3b35e564`
 (revision).
-**Audited:** 2026-08-15, against `AUDIT_RULES.md` (`AUD-0`–`AUD-12`) in the author's rules hub.
+**Audited:** 2026-08-15, against `AUDIT_RULES.md` (`AUD-0`–`AUD-12`) in the author's internal rules.
 **Method:** the manuscript read against its own released code and results, not against itself. Every
 number was recomputed here from the raw CSVs before being accepted, including numbers delivered with
 a summary that already stated them.
@@ -57,7 +57,7 @@ a summary that already stated them.
 
 | | |
 |---|---|
-| **Where** | `config/`; `scripts/audit_gate.py` in the rules hub |
+| **Where** | `config/`; an internal pre-submission audit gate |
 | **Before** | Six `calibration_sha256` stamps in the delivered results resolved to no file in the repository. Under `R6` that reads as drift and blocks submission |
 | **Issue (two layers)** | (a) The configurations that produced the arrhythmia subsampling, high-dimensional and four-recalibrator runs lived only on the second machine and had never been shipped. (b) **More seriously, the gate was wrong**: it hashed each config file's *bytes*, while the stamp is `sha256` over the config's **canonical JSON serialisation** (`src/nsclinfs/hashing.py`). The two coincide only when the file was written by that serialiser — true of all four configs authored in this repository, which is why hashing bytes had never failed and had never been tested against a config written anywhere else |
 | **After** | Six configs committed byte-exact (they were correct; the gate was not), with a `CALIB_MAP.md` recording each stamp against its file. The gate now accepts either hash; this cannot create a false pass, because a stamp must still resolve to a committed, tracked file |
