@@ -637,9 +637,8 @@ Across \result{80} dataset-by-budget cells the rule agrees with the measured ver
 \result{59\,\%} of the time. It is not a predictor but a one-sided screen: sensitivity is
 \result{1.00}---it flags every budget that genuinely degrades selective reliability, with
 \result{zero} false negatives---while specificity is \result{0.15}, flagging \result{33} budgets that
-turn out to be safe. A screen that says ``unsafe'' almost everywhere is not a certificate, and we
-report it as the failure it is rather than as a conservative success. Two details are worth keeping:
-the datasets whose curves never reach saturation within the grid are exactly the ones the
+turn out to be safe. A screen that says ``unsafe'' almost everywhere is not a certificate. Two details are
+worth keeping: the datasets whose curves never reach saturation within the grid are exactly the ones the
 probe-injection experiment identified as having distributed signal, and every cell the rule did call
 safe was in fact safe---but on \result{six} such cells, which is far too few to rest anything on, and
 we do not.
@@ -665,7 +664,7 @@ $p\leq\result{8}$---the harm still rises with width (Spearman $\rho=\result{+0.7
 $p=\result{0.016}$), from essentially zero on the narrowest ($\leq\result{0.002}$ at $p=\result{9}$--$\result{11}$)
 to \result{$+0.020$} at $p=\result{18}$. So the association with retained count reported above is
 partly the collinearity, and what a fixed budget \emph{discards}---which grows with $p$---matters
-independently of what it keeps. The restriction is worth stating: dropping the three narrowest
+independently of what it keeps. One restriction bounds this: dropping the three narrowest
 datasets is forced by the design rather than chosen, and it removes exactly the cases that would
 anchor the low end, so we read this as a caution against the strong form of the retained-count claim
 rather than as a measurement of the width effect's size. The two are not rivals---at matched $k=1$
@@ -769,8 +768,7 @@ are unequal in the scale-free sense (Gini \result{0.83} under random-forest impo
 reconciliation---high inequality, low in-budget share---is exactly why the budget-relevant statistic is
 the one that tracks the harm.
 
-We stop there deliberately, because concentration does \emph{not} order all four datasets, and we
-tested that rather than assume it. Under $L_1$-logistic ranking the four do fall in the predicted
+Concentration does \emph{not} order all four datasets. Under $L_1$-logistic ranking the four do fall in the predicted
 order at every budget we examined ($k\in\{1,2,4,8\}$), which is suggestive. It does not replicate. Under
 mutual information and random-forest importance the order fails at every budget, and it fails the same
 way each time: arrhythmia ranks as the most concentrated of the four, which is an artefact of its
@@ -783,7 +781,7 @@ $k/p$, the share a uniform ranker would achieve, giving the lift of the observed
 chance at the same width. Computed for every ranker at every budget---\result{21} combinations, all
 reported---the corrected statistic reproduces the harm ordering \result{0} times, and places
 arrhythmia \emph{last} in concentration although it is the second-most harmed. This is a negative
-result about our own proposed explanation and we report it as one.
+result about the explanation proposed above.
 
 What does survive is narrower and robust. Prostate is more concentrated than arcene, and less harmed,
 under every ranker, every budget and every statistic including the width-corrected one. The
@@ -900,8 +898,7 @@ baseline. Selective reliability does not follow: AURC recovery is negative at th
 and its correlation with flexibility runs the \emph{opposite} way (\result{$\rho=-0.90$}), with the
 largest move in either direction worth only \result{3.1\,\%} of the baseline---about
 \result{8\,\%} of the AURC penalty that reduction itself inflicts. Net-benefit recovery does rise
-monotonically with flexibility (\result{$\rho=+1.00$}), and we report that rather than describe it as
-flat, but its largest value is \result{$+0.0028$}, or \result{0.9\,\%} of baseline: a thirtieth of
+monotonically with flexibility (\result{$\rho=+1.00$}), but its largest value is \result{$+0.0028$}, or \result{0.9\,\%} of baseline: a thirtieth of
 what the same ladder achieves for calibration error. The failure to recover therefore cannot be
 attributed to an insufficiently flexible recalibrator, because the most flexible recalibrators are
 precisely the ones that recover the most calibration error and the least selective reliability.
@@ -1061,13 +1058,12 @@ and three standard rankers, reducing the feature budget was associated, at aggre
 degraded selective reliability (AURC, worse in 94 of 108 cells), reduced clinical net benefit (80 of
 108), and larger, less informative conformal prediction sets (79 of 108): a loss comparable in extent
 to, and partly independent of, the loss of discrimination, and present in cells where discrimination
-remained materially preserved. That selective-reliability figure carries a qualification we measured
-rather than assumed, and it belongs beside the headline rather than in a limitation. AURC is computed
+remained materially preserved. That selective-reliability figure carries a measured qualification. AURC is computed
 from a confidence that is itself a function of the predicted probability, so part of the degradation
 it reports is a property of the probability scale. Recomputing the same penalty with a confidence
 taken from the feature space alone---distance to the training support, which the model's probability
 never enters---drops it from \result{$+0.0334$} to \result{$+0.0116$}. Roughly \result{two-thirds} of
-the measured selective-reliability harm is therefore scale-borne, and we say so plainly. The
+the measured selective-reliability harm is therefore scale-borne. The
 remaining \result{third} survives a confidence that cannot see the probability at all, decisively
 (\result{$p=7\times10^{-103}$}) and with no dependence on cohort size, which is what makes it
 evidence of a genuine loss of error-ordering rather than a re-description of the calibration result.
@@ -1104,7 +1100,7 @@ most deployment-relevant property the protocol exposes.
 dataset-dependent rather than intrinsic to feature reduction---but the revision's retained-count
 analysis (Section~\ref{sec:metasafe}) shows that the originally proposed screen (``more candidate
 features means safer reduction'') conflated two explanations that the budget rule links mechanically.
-Separated by the exact-$k$ arm, the honest statement is narrower: harm tracks the \emph{absolute
+Separated by the exact-$k$ arm, the statement is narrower: harm tracks the \emph{absolute
 number of retained features} more strongly than dataset width ($\rho=\result{-0.78}$ versus
 $\rho=\result{-0.71}$,
 both leave-one-out robust); at matched $k=1$ every dataset, wide or compact, is materially harmed;
@@ -1215,7 +1211,7 @@ enters. It behaves as the independent signal that ensemble disagreement was not:
 \result{106{,}943} out-of-fold points its Spearman correlation with $|p-0.5|$ is \result{$+0.40$},
 against \result{$-0.991$} for tree spread. That pooled figure is dominated by the readmission cohort,
 which supplies \result{95\,\%} of the points, so we report the unweighted mean over the twelve
-datasets, \result{$+0.27$}, as the honest central value. The per-dataset correlations span
+datasets, \result{$+0.27$}, as the central value. The per-dataset correlations span
 \result{$-0.65$} to \result{$+0.74$} with mixed signs, and a dedicated check found no trend with
 cohort size---Spearman between $n$ and the correlation is \result{$-0.08$}
 ($p=\result{0.80}$)---so the partial independence is a property of the signal rather than of any one
@@ -1226,7 +1222,7 @@ predictions and with no refitting, then gives the sharpest statement we can make
 reliability was measuring. The mean AURC reduction penalty falls from \result{$+0.0334$} under the
 probability-scale confidence to \result{$+0.0116$} under the probability-independent one. Roughly
 \result{two-thirds} of the measured selective-reliability harm was therefore a property of the
-probability scale, and we report that correction at full prominence rather than in passing. The
+probability scale. The
 remaining \result{35\,\%}, however, \emph{survives}, and survives decisively---a Wilcoxon test over
 the \result{2{,}160} cells gives $p=\result{7\times10^{-103}}$ with a positive median---and shows no
 dependence on cohort size either. The concession above is accordingly upgraded from a qualitative
@@ -1242,9 +1238,8 @@ is, whether the penalty that outlives a probability-independent confidence sits 
 datasets whose signal is concentrated, or whose retained counts are smallest. It does not: across the
 twelve datasets the surviving penalty correlates with the concentration index at
 $\rho=\result{+0.21}$ ($p=\result{0.51}$), with the retained count at \result{$-0.16$}, and with $p$
-at \result{$-0.13$}---all null. We report this because it is the tidier story that a reader might
-otherwise assume: on this evidence the two findings are separate, not one mechanism seen twice, and
-at twelve datasets the test is in any case low-powered. Subgroup gaps use a coarse
+at \result{$-0.13$}---all null. On this evidence the two are separate findings rather than one
+mechanism seen twice, though at twelve datasets the test is low-powered. Subgroup gaps use a coarse
 protected attribute (sex, gender, or a binary age split) and a minimum subgroup size, so they
 are conservative; following SAGER guidance we note that these attributes are recorded only as
 binary categories, that sex and gender are not distinguished in the source data, and that a finer

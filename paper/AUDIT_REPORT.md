@@ -59,7 +59,7 @@ a summary that already stated them.
 |---|---|
 | **Where** | `config/`; `scripts/audit_gate.py` in the rules hub |
 | **Before** | Six `calibration_sha256` stamps in the delivered results resolved to no file in the repository. Under `R6` that reads as drift and blocks submission |
-| **Issue (two layers)** | (a) The configurations that produced the arrhythmia subsampling, high-dimensional and four-recalibrator runs lived only on the collaborator's machine and had never been shipped. (b) **More seriously, the gate was wrong**: it hashed each config file's *bytes*, while the stamp is `sha256` over the config's **canonical JSON serialisation** (`src/nsclinfs/hashing.py`). The two coincide only when the file was written by that serialiser — true of all four configs authored in this repository, which is why hashing bytes had never failed and had never been tested against a config written anywhere else |
+| **Issue (two layers)** | (a) The configurations that produced the arrhythmia subsampling, high-dimensional and four-recalibrator runs lived only on the second machine and had never been shipped. (b) **More seriously, the gate was wrong**: it hashed each config file's *bytes*, while the stamp is `sha256` over the config's **canonical JSON serialisation** (`src/nsclinfs/hashing.py`). The two coincide only when the file was written by that serialiser — true of all four configs authored in this repository, which is why hashing bytes had never failed and had never been tested against a config written anywhere else |
 | **After** | Six configs committed byte-exact (they were correct; the gate was not), with a `CALIB_MAP.md` recording each stamp against its file. The gate now accepts either hash; this cannot create a false pass, because a stamp must still resolve to a committed, tracked file |
 | **Scope** | The gate fix is portfolio-wide. The same failure class is already documented in that function's own comment for another paper, where the recommended action for an unresolved stamp is **withdrawal** |
 
@@ -163,36 +163,43 @@ Strict ancestry, verified with `git merge-base --is-ancestor` in both links. The
 flip number reached the paper. Once the repository is public a reviewer can run the same two commands.
 
 
-### 3.8 The enrichment code, and a leak that was visible in exactly one place
+### 3.8 All enrichment code read, and the leak located
 
-The Arm B finding prompted the obvious question — does anything else carry the same pattern? — and the
-answer was that we could not tell, because **one of eighteen enrichments had shipped its code.** The
-rest existed in this repository as numbers. That is now fixed: all twenty-one scripts and the frozen
-library copy they ran against are committed under `experiments/enrichments/`, and `AUD-1 (Produced)`
-was added to the gate so the gap cannot reopen silently.
-
-Every script was then read against three questions:
+The Arm B finding prompted the obvious question — does anything else carry the same pattern? — and at
+that point we could not tell, because **one of nineteen enrichments had shipped its code.** The rest
+existed here as numbers. All 21 scripts and the frozen library copy they ran against are now committed
+under `experiments/enrichments/`, `AUD-1 (Produced)` was added to the gate so the gap cannot reopen
+silently, and every script has been read against three questions:
 
 1. Does any **label-informed** choice happen outside the cross-validation?
 2. Does any statistic computed on **all rows** enter a per-fold model?
 3. Are **imputation, ranking and standardisation** fitted on the training fold only?
 
-**Result: the leak was in P1 Arm B and nowhere else.** Two results are worth stating individually
-because the manuscript leans on them hardest:
+| | scripts | outcome |
+|---|--:|---|
+| fit a model or select features | 7 | in-fold clean, **except** P1 Arm B's kept-set selection |
+| pure analyses over cached out-of-fold outputs | 14 | fit nothing, select nothing — no leakage surface exists |
+
+**The leak is in P1 Arm B and nowhere else.** The four the manuscript leans on hardest:
 
 | experiment | what the code shows |
 |---|---|
-| **Tier 6** — the $-d$ confidence carrying "two-thirds of the harm is scale-borne" into the Abstract | **Clean.** The `BallTree` is built on `Xtr_z` — the training fold — and queried with the held-out rows; the source comment states it outright (*"held-out rows not in the tree"*). Imputation median and standardisation $\mu,\sigma$ are training-fold only |
-| **Tier 9** — the concentration index | **Clean.** The ranker scores are recomputed **inside each training fold** and averaged across folds; the index never sees a held-out row. A scan flagged the scoring *function* because it has no fold context of its own, and the *call site* is inside the fold loop |
+| **Tier 6** — the $-d$ confidence behind "two-thirds is scale-borne" | **Clean.** The `BallTree` is built on the training fold and queried with held-out rows; the source comment states it (*"held-out rows not in the tree"*). Imputation and standardisation are training-fold only |
+| **Tier 3** — beta and temperature recalibration | **Clean, and self-validating.** The inner CV splits the training fold; the calibrator is fitted on training labels. The new arms are trusted only after two gates: that `none`/`sigmoid` reproduce the cached out-of-fold probabilities, and that the hand-written cv=3 ensemble reproduces `CalibratedClassifierCV` to $\sim10^{-9}$ |
+| **Tier 9** — the concentration index | **Clean.** Ranker scores are recomputed inside each training fold and averaged; the index never sees a held-out row |
+| **Tier 4** — ensemble disagreement | **Clean.** Same seed derivation as the main grid, so the pairing holds; everything in-fold |
 
-The remaining flags were false positives on inspection: an import line, a pandas rank-normalisation
-helper, a constant list, and a comment.
+**Two defects were fixed, neither of which changes a number.** Six scripts carried an absolute path to
+the machine that produced them and so could not run anywhere else — which contradicts this
+repository's own reproducibility claim; the runnable copies now resolve their root from `__file__`,
+while the as-run copies inside the result folders stay byte-exact under their signed manifests. And
+`compute_tier5.py` opened with Tier 1's docstring: the code is right, the header was not.
 
-**One asymmetry is worth recording rather than glossing.** Had Tier 9 or P3 been label-informed, it
+**One asymmetry worth recording.** Had Tier 9 or the safe-budget diagnostic been label-informed, it
 would have made their results *optimistic* — and both are **negative**. A predictor built with label
-knowledge that still fails to predict is a stronger negative, not a weaker one. They are not
-label-informed, so the point is moot here; but it is the direction to check first whenever a null
-result rests on a constructed predictor.
+knowledge that still fails is a stronger negative, not a weaker one. Neither is label-informed, so the
+point is moot here; but it is the direction to check first whenever a null rests on a constructed
+predictor.
 
 ---
 
@@ -215,7 +222,7 @@ result rests on a constructed predictor.
 |---|---|
 | Response letter | Rewritten with a second-round section, including an explicit list of the three claims withdrawn during this audit and the reason for each. 5 pp, builds clean. Salutation is "Greetings," per `COVER-letter` — never "Dear" |
 | Cover letter | **Rewritten.** It was a first-submission letter, opened "Dear Editors,", and advertised the withdrawn screening claim to the editor. Now a resubmission letter with a single-author statement and no reviewer suggestions. `cover_letter.txt` is generated *from* the `.tex` by a committed script so the two cannot drift |
-| `RESPONSE.md` | Second-round enrichments logged as **E10–E18**, renumbered deliberately: `E1`–`E9` are the first round and the collaborator's own notes reused `E1`–`E5` for different work, so an unqualified "E2" already meant two things |
+| `RESPONSE.md` | Second-round enrichments logged as **E10–E18**, renumbered deliberately: `E1`–`E9` are the first round and the notes from that run reused `E1`–`E5` for different work, so an unqualified "E2" already meant two things |
 | Submission archive | **Not yet rebuilt.** The current `paper/submission_revision/` is the 2026-08-12 build and is stale. It must be regenerated after `P1 v2` and `P6` land, and must satisfy: no manuscript PDF (the venue compiles the source), separate figure files, the response as a separate file, no stray `.bib`, and an empty-`TEXMFHOME` compile test |
 
 ---

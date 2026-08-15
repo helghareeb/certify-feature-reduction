@@ -45,8 +45,36 @@ skipped by expected row count; shard writes are atomic. Full-burn totals: 87 + 2
 | subsample-agreement table | `python experiments/subsample_agreement.py` |
 | selection-stability figure (stability_harm.pdf) | `python experiments/ranking_stability.py --workers 6` (~40 min first run; cached parquet thereafter) |
 | cover letter plain-text version, generated from the .tex so the two cannot drift | `python experiments/mk_cover_txt.py` (run 2026-08-15; writes `paper/cover_letter.txt`, no manuscript number) |
+| public-compendium sync check (no manuscript number; `--check` exits non-zero if normalisation is due) | `python scripts/sync_public.py --check` (run 2026-08-16) |
 | v1-vs-v2 invariance report | `python experiments/v1_v2_diff.py` |
 
+
+## 2b. Enrichment controls (`experiments/enrichments/`)
+
+All ran on a second machine 2026-08-13..16 under the pinned environment, against the configurations
+in `config/` whose `calibration_sha256` is stamped into each output. Each result folder under
+`results/enrichments/` carries the as-run copy of its script plus a `MANIFEST.sha256`; the copies
+here resolve the repository root from `__file__` so they run from a clone (`NSCLINFS_REPO` overrides).
+
+| script | produces | note |
+|---|---|---|
+| `compute_tier1.py`, `compute_tier1_materiality.py` | ECE bin sweep, logistic + random forest | cache-only |
+| `compute_tier5.py`, `compute_tier5_materiality.py` | the same sweep for gradient boosting | cache-only |
+| `tier3_run.py` | beta + temperature recalibration | fits models; gates its own machinery against `CalibratedClassifierCV` before trusting it |
+| `tier4_disagreement.py` | ensemble-disagreement confidence | fits models, in-fold |
+| `tier6_distance.py` | distance-to-training-support confidence | fits models; neighbours drawn from the training fold only |
+| `compute_tier7.py` | penalty versus $n$ at fixed $p$ | aggregation only |
+| `compute_tier8.py` | cross-dataset correlates, partials, LODO, bootstrap | analysis only |
+| `compute_tier9.py` | concentration index | scores recomputed per training fold |
+| `compute_e2.py` | independence versus cohort size | cache-only |
+| `compute_e3_ASRUN.py` | cross-axis correlation matrix | cache-only |
+| `compute_p2.py`, `_verify_p2.py` | recalibrator flexibility ladder + its cross-check | cache-only |
+| `compute_p3_ASRUN.py` | pre-registered safe-budget diagnostic | cache-only |
+| `compute_p4_ASRUN.py` | localisation of the surviving penalty | cache-only |
+| `compute_p5_ASRUN.py` | matched absolute budget | cache-only |
+| `compute_p6.py` | combined-confidence arm | not yet in the manuscript |
+| `compute_p1.py`, `compute_p1_v2.py` | probe-injection dose-response (Arm A) and the superseded Arm B | Arm A is in the manuscript; **Arm B is not** — its kept set was selected outside the cross-validation |
+| `compute_p1b_v3.py` | Arm B re-run with in-fold kept-set selection | running |
 ## 3. Manuscript + response letter
 
 ```

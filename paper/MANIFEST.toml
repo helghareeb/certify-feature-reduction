@@ -117,7 +117,7 @@ columns = ["dataset", "method", "classifier", "budget", "calibrate", "rep"]
 "top256_share" = "as top1_share; not reported"
 "gini" = "scale-free concentration (Gini) of the ranker scores. CONTRADICTION, reconciled 2026-08-15 rather than left uncited: an earlier draft claimed the four high-dimensional datasets are ordered from least to most harmed by concentration. Gini ranks arcene ABOVE arrhythmia under all three rankers while arcene is the more harmed of the two, so it refutes that ordering. The section now claims only the prostate-vs-arcene contrast (robust 9/9 across three rankers and three statistics), states the Gini disagreement explicitly, and reports Gini 0.83 for arcene beside its 15% top-8 share to show why a scale-free index and an in-budget share diverge at p=10,000. Glioma has no Tier 9 measurement at all and is excluded rather than assumed to fit; it has been requested."
 
-# --- P1 probe-injection dose-response (results/p1_from_the secondary compute node/), added 2026-08-15.
+# --- P1 probe-injection dose-response (results/p1_from_nadia/), added 2026-08-15.
 "auroc_full" = "the full-feature model AUROC at each probe dose / kept-set size; reported in prose as the reason the penalty closes -- the full model degrades under noise padding while the reduced model does not"
 "auroc_red" = "the reduced-model AUROC at the same cell; same paragraph, same reason"
 "auroc_penalty" = "the AUROC reduction penalty; the dose-response values are reported per dataset in the high-dimensional section (cleveland +0.054 to +0.006, spectf +0.004 to -0.037, mammographic +0.086 to +0.081)"
