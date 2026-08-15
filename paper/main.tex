@@ -629,6 +629,21 @@ width nor any other property we measured---certifies a budget in advance. The re
 identifies the \emph{high-risk} regime (small $k$, most severely below $k\approx4$), and the audit
 itself is the certificate.
 
+Because that is a negative claim, we gave one candidate proxy a genuine chance to refute it, under
+thresholds fixed in a deposited pre-registration before the diagnostic was computed. The candidate was
+the ranker's concentration curve: define the saturation point $k^{*}$ as the smallest budget at which
+the top-$k$ score share reaches \result{90\,\%}, and predict that any budget below $k^{*}$ is unsafe.
+Across \result{80} dataset-by-budget cells the rule agrees with the measured verdict
+\result{59\,\%} of the time. It is not a predictor but a one-sided screen: sensitivity is
+\result{1.00}---it flags every budget that genuinely degrades selective reliability, with
+\result{zero} false negatives---while specificity is \result{0.15}, flagging \result{33} budgets that
+turn out to be safe. A screen that says ``unsafe'' almost everywhere is not a certificate, and we
+report it as the failure it is rather than as a conservative success. Two details are worth keeping:
+the datasets whose curves never reach saturation within the grid are exactly the ones the
+probe-injection experiment identified as having distributed signal, and every cell the rule did call
+safe was in fact safe---but on \result{six} such cells, which is far too few to rest anything on, and
+we do not.
+
 One candidate proxy deserves explicit dismissal, because it is the one a reader is most likely to
 suspect: \emph{cohort size}. Across the twelve datasets the association between $n$ and the harm is
 absent to begin with (Spearman $\rho=\result{+0.05}$ against the AUROC penalty,
@@ -640,6 +655,22 @@ in other words, was $p$ wearing a disguise. We report this because the intuition
 are the fragile ones is natural, widely held, and---on these datasets---not what the measurements
 say. With twelve datasets these correlations are descriptive rather than confirmatory, and we treat
 them as such.
+
+The retained count is not the whole account either, and the same collinearity that misled us about
+sample size applies to it: because the fractional budget sets $k=\lceil 0.25p \rfloor$, a small
+retained count and a narrow dataset are hard to tell apart. We therefore repeated the comparison at a
+\emph{matched absolute} budget. Holding $k=\result{8}$ across the clinical datasets for which that is
+genuinely a reduction---\result{nine} of the twelve, since $k=8$ retains everything when
+$p\leq\result{8}$---the harm still rises with width (Spearman $\rho=\result{+0.77}$,
+$p=\result{0.016}$), from essentially zero on the narrowest ($\leq\result{0.002}$ at $p=\result{9}$--$\result{11}$)
+to \result{$+0.020$} at $p=\result{18}$. So the association with retained count reported above is
+partly the collinearity, and what a fixed budget \emph{discards}---which grows with $p$---matters
+independently of what it keeps. The restriction is worth stating: dropping the three narrowest
+datasets is forced by the design rather than chosen, and it removes exactly the cases that would
+anchor the low end, so we read this as a caution against the strong form of the retained-count claim
+rather than as a measurement of the width effect's size. The two are not rivals---at matched $k=1$
+every dataset is still materially harmed---and the practical conclusion is unchanged, because neither
+quantity certifies a budget in advance.
 
 \begin{table}[t]
 \centering
@@ -1047,6 +1078,21 @@ features were dropped. The deployment-relevant harms---degradation in the trustw
 model's confidence and in the net benefit of acting on it---are therefore the most robust signal, and
 none of them is visible to the AUROC-only evaluation by which feature reduction is usually justified.
 
+Stating the dissociation as a correlation makes its shape clearer than the scattered observations
+above. Orienting every axis so that positive means worse, and correlating the reduction penalties
+across all \result{108} cells, the reliability axes do not form one scale. Calibration error and
+selective reliability correlate at only $\rho=\result{+0.30}$: knowing that reduction worsened a
+model's calibration tells you little about whether it worsened the model's ability to rank its own
+errors. But selective reliability and conformal set size correlate at $\rho=\result{+0.89}$, and
+calibration error correlates with selective calibration error at $\rho=\result{+0.97}$---the latter a
+sanity check, since the two are the same quantity on different subsets. The pattern is not noise: the
+axes that depend on the \emph{ordering} of predicted probabilities move together, the axes defined on
+the probability \emph{scale} move together, and the two groups are nearly independent of each other.
+That is the same division the recalibration ladder implies mechanically
+(Section~\ref{sec:recal})---recalibration repairs the scale and cannot repair an ordering---arriving
+here from a different direction, and it is why a single calibration number cannot stand in for the
+audit.
+
 \paragraph{Why selective reliability matters here.} AURC summarises whether a model's own
 confidence can be trusted to triage which predictions to act on. A reduced model with a larger
 AURC is one whose abstention or referral behaviour is less dependable---a property of direct
@@ -1190,7 +1236,15 @@ wholly, independent evidence. Consistent with the mechanism proposed in
 Section~\ref{sec:recal}, the surviving component is what one would expect if reduction damages the
 ordering of cases by genuine difficulty rather than merely the scale on which that difficulty is
 reported. We did not search for a further confidence signal that would restore more of the penalty;
-$-d$ was pre-specified, and its result is reported as it came. Subgroup gaps use a coarse
+$-d$ was pre-specified, and its result is reported as it came. We also asked whether that surviving
+component is the same phenomenon as the distributed-signal account of the high-dimensional arm---that
+is, whether the penalty that outlives a probability-independent confidence sits preferentially in the
+datasets whose signal is concentrated, or whose retained counts are smallest. It does not: across the
+twelve datasets the surviving penalty correlates with the concentration index at
+$\rho=\result{+0.21}$ ($p=\result{0.51}$), with the retained count at \result{$-0.16$}, and with $p$
+at \result{$-0.13$}---all null. We report this because it is the tidier story that a reader might
+otherwise assume: on this evidence the two findings are separate, not one mechanism seen twice, and
+at twelve datasets the test is in any case low-powered. Subgroup gaps use a coarse
 protected attribute (sex, gender, or a binary age split) and a minimum subgroup size, so they
 are conservative; following SAGER guidance we note that these attributes are recorded only as
 binary categories, that sex and gender are not distinguished in the source data, and that a finer

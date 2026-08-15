@@ -1,0 +1,6 @@
+,ECE,AURC,net_benefit,conformal_setsize,selective_ECE
+ECE,1.0,0.298,0.6,0.302,0.968
+AURC,0.298,1.0,0.661,0.885,0.309
+net_benefit,0.6,0.661,1.0,0.774,0.623
+conformal_setsize,0.302,0.885,0.774,1.0,0.315
+selective_ECE,0.968,0.309,0.623,0.315,1.0

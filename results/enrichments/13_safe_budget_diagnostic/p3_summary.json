@@ -1,0 +1,29 @@
+{
+  "n_cells": 80,
+  "agreement": 0.588,
+  "sensitivity": 1.0,
+  "specificity": 0.154,
+  "kstar": {
+    "prostate_ge": 5966,
+    "arcene": 10000,
+    "arrhythmia": 128,
+    "cleveland": 16,
+    "pima": 8,
+    "ilpd": 8,
+    "heartfailure": 8,
+    "wdbc": 16,
+    "statlogheart": 16,
+    "haberman": 4,
+    "hepatitis": 16,
+    "mammographic": 4,
+    "bcw": 8,
+    "spectf": 64,
+    "gli85": 22283,
+    "diabetes130": 16
+  },
+  "thresholds": {
+    "saturation": 0.9,
+    "spike_abs": 0.02,
+    "ranker": "rf_importance"
+  }
+}

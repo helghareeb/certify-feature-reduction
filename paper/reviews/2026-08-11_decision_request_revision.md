@@ -2,7 +2,7 @@
 
 - **Submission ID:** 2650209c-ff1e-4df4-aeb0-75ef3b35e564 · version v.1.0
 - **Manuscript:** "Aggressive feature reduction degrades the selective reliability and clinical
-  net benefit of clinical risk models" (`ns-clinical-fs.pdf`)
+  net benefit of clinical risk models" (`certify-feature-reduction.pdf`)
 - **Editor:** PIJUSH SAMUI · Recommendation: **Request Revision** · Editor Comments: —
 - **Assistant Editor:** Sadanand Deshpande · Support: srep@nature.com
 - **Deadline:** not stated in the email ("within the mentioned deadline"); portal deadline **2026-08-24** (author-confirmed 2026-08-11).

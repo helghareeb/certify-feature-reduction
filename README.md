@@ -143,12 +143,17 @@ refuted a claim in the paper, a Discussion sentence recommending a criterion the
 two sections earlier, and a stale claim in the cover letter. All three are fixed, and all three are
 disclosed in the response to reviewers.
 
-## Acknowledgement
+## Compute
 
-Part of the enrichment grid in `results/enrichments/` was executed on a secondary compute node
-operated by a collaborator, under configurations and pre-registrations fixed in advance here. Every
-delivered result was re-verified by SHA-256 manifest and independently recomputed from its raw
-outputs before any number entered the manuscript.
+Part of the enrichment grid in `results/enrichments/` was executed on a **second machine**, under
+configurations, pre-registrations and scripts fixed in advance and committed here. This is a hardware
+arrangement and nothing more: no one other than the author contributed to the design, analysis or
+interpretation of this study.
+
+Every result returned from that machine was re-verified by SHA-256 manifest on the author's box and
+independently recomputed from its raw per-unit outputs before any number entered the manuscript. The
+scripts that produced them are in `experiments/enrichments/`, so the method can be read and not only
+the numbers checked.
 
 ## License and citation
 

@@ -117,7 +117,7 @@ columns = ["dataset", "method", "classifier", "budget", "calibrate", "rep"]
 "top256_share" = "as top1_share; not reported"
 "gini" = "scale-free concentration (Gini) of the ranker scores. CONTRADICTION, reconciled 2026-08-15 rather than left uncited: an earlier draft claimed the four high-dimensional datasets are ordered from least to most harmed by concentration. Gini ranks arcene ABOVE arrhythmia under all three rankers while arcene is the more harmed of the two, so it refutes that ordering. The section now claims only the prostate-vs-arcene contrast (robust 9/9 across three rankers and three statistics), states the Gini disagreement explicitly, and reports Gini 0.83 for arcene beside its 15% top-8 share to show why a scale-free index and an in-budget share diverge at p=10,000. Glioma has no Tier 9 measurement at all and is excluded rather than assumed to fit; it has been requested."
 
-# --- P1 probe-injection dose-response (results/enrichments/12_probe_injection_dose_response/), added 2026-08-15.
+# --- P1 probe-injection dose-response (results/p1_from_the secondary compute node/), added 2026-08-15.
 "auroc_full" = "the full-feature model AUROC at each probe dose / kept-set size; reported in prose as the reason the penalty closes -- the full model degrades under noise padding while the reduced model does not"
 "auroc_red" = "the reduced-model AUROC at the same cell; same paragraph, same reason"
 "auroc_penalty" = "the AUROC reduction penalty; the dose-response values are reported per dataset in the high-dimensional section (cleveland +0.054 to +0.006, spectf +0.004 to -0.037, mammographic +0.086 to +0.081)"
@@ -125,7 +125,7 @@ columns = ["dataset", "method", "classifier", "budget", "calibrate", "rep"]
 "dose" = "probe-injection dose as a multiple of the original feature count; reported as 1x/2x/5x/10x in prose"
 "p_full" = "feature count at that dose (original x (1+dose)); reported in prose to show the absolute budget was held fixed while p grew"
 "k_aggr" = "the absolute aggressive budget; reported in prose as k=3, 1 and 11 for cleveland, mammographic and spectf, held fixed across doses -- the control that makes Arm A interpretable"
-"kept_features" = "Arm B kept-set size. NOT REPORTED, and not for lack of interest: in the delivered run the aggressive budget was 25% of the kept set, so k rose 25->2500 down the ladder, confounding kept-set composition with the absolute retained count -- which is this paper own headline effect. A re-run holding k fixed at 25 has been requested; until it lands the Arm B U-shape supports no claim about concentration and is excluded rather than reported with a caveat."
+"kept_features" = "Arm B kept-set size. HELD OUT OF THE MANUSCRIPT, and the reason changed on 2026-08-16. The original objection -- that the aggressive budget was 25 percent of the kept set, so k rose 25 to 2500 down the ladder and confounded composition with the absolute retained count -- was fixed: the re-run holds k_aggr at 25 on every row, verified. But the re-run exposed a second and more serious problem in the design I approved: the kept set itself is chosen by ranking the FULL dataset including labels, once, outside the cross-validation (compute_p1_v2.py line 106). The optimistic bias that creates decreases monotonically as the kept set widens -- keep=100 is strongly label-optimised, keep=10000 is not selected at all -- so it pushes in exactly the direction measured. Diagnostic: the entire rise in the penalty comes from the reduced-25 model falling 0.905 to 0.821 while the full-kept model barely moves, which is the signature of a decreasing selection advantage and not what a pure distributed-signal account predicts. An in-fold re-selection re-run has been requested and pre-ruled three ways. Nothing from this arm is cited in the paper."
 "tag" = "provenance label for the cell (e.g. cleveland_dose5, arcene_keep1000); not a measured quantity"
 
 # --- P1 Arm A v2, with dispersion (results/enrichments/12_probe_injection_dose_response/), 2026-08-15.
@@ -133,6 +133,50 @@ columns = ["dataset", "method", "classifier", "budget", "calibrate", "rep"]
 "auroc_penalty_sd" = "within-cell standard deviation over the 180 units; the manuscript reports the bootstrap interval rather than the sd"
 "aurc_full" = "full-model AURC at that dose; the AUROC arm is what the dose-response claim rests on, and the AURC arm is not separately tabulated"
 "aurc_red" = "reduced-model AURC at that dose; same reason"
+
+# --- E3 cross-axis coherence, P4 localisation null, P5 matched-absolute-budget (2026-08-16).
+"harm_auroc_k8" = "AUROC reduction penalty at a matched absolute budget of k=8; reported in the retained-count section as the correlation with p over the nine clinical datasets for which k=8 is genuinely a reduction"
+"block" = "provenance label separating the clinical panel from the exploratory high-dimensional arm. The manuscript reports the clinical figure ONLY and never pools the two; this column exists so that separation is checkable rather than asserted. The pooled correlation over all 13 datasets (rho=+0.598) is deliberately NOT reported, because pooling the arms is precisely what the high-dimensional section says it never does."
+
+"conformal_setsize" = "conformal set size in the cross-axis matrix. The first delivery named it conformal_eff and was the only axis not harm-oriented, so its four correlations carried the wrong SIGN -- reading as disagreement what is in fact strong agreement. Recomputed here from summary.csv with every axis oriented positive-is-worse: all ten magnitudes reproduce and the four conformal signs flip. The corrected artifact was re-delivered and matches. The manuscript reports +0.89 with selective reliability."
+"selective_ECE" = "selective calibration error in the cross-axis matrix; its +0.97 correlation with ECE is reported as the sanity check that the matrix measures what it claims"
+"retained_k" = "retained count at the aggressive budget, reused as a predictor in the localisation null; reported in prose as retained-k"
+"gini_rf" = "concentration index reused from the Tier 9 artifact as a predictor in the localisation null; the index itself is declared under gini above"
+
+# --- P3 pre-registered concentration-curve safe-budget diagnostic (2026-08-16).
+"kstar" = "the saturation budget: smallest k at which the top-k score share reaches 90 percent; the threshold was locked in PRESPEC_p3.md before the diagnostic was computed, and is reported in prose"
+"pred_unsafe" = "the diagnostic prediction (budget < kstar); its confusion matrix against the measured verdict is reported in prose as 59 percent agreement, sensitivity 1.00, specificity 0.15"
+"obs_spike" = "the measured verdict (AURC penalty >= +0.02, also locked in advance); the other half of the same confusion matrix"
+
+
+[external_results]  # AUD-1 (Produced) -- committed result groups whose producing script is
+                    # elsewhere in the repo. The declaration must NAME a script that IS committed;
+                    # naming an absent one still FAILS, by design.
+"results/submitted-v1" = "the frozen v1 aggregates, produced by run_clinical_fs.py under config/submitted-v1/; never regenerated (N4)"
+"results/spotcheck_v1" = "single-cell spot check of the v1 pipeline, produced by run_clinical_fs.py"
+"results/spotcheck_v2" = "single-cell spot check of the rebuilt pipeline, produced by run_clinical_fs.py"
+
+# The enrichment code arrived 2026-08-16 and is committed under experiments/enrichments/,
+# together with the frozen library copy it ran against. Every script was read against the
+# three leakage questions before this declaration was written; see AUDIT_REPORT.md.
+
+"results/enrichments/01_ece_bin_sensitivity" = "experiments/enrichments/compute_tier1.py + compute_tier1_materiality.py"
+"results/enrichments/02_high_dimensional_arm" = "experiments/enrichments/compute_tier7.py (the high-dimensional arm shares its loader and driver; the frozen library copy is experiments/enrichments/frozen_nsclinfs/highdim_data.py)"
+"results/enrichments/03_recalibrators_beta_temperature" = "experiments/enrichments/tier3_run.py"
+"results/enrichments/04_ensemble_disagreement_confidence" = "experiments/enrichments/tier4_disagreement.py"
+"results/enrichments/05_gradient_boosting_bin_sweep" = "experiments/enrichments/compute_tier5.py + compute_tier5_materiality.py"
+"results/enrichments/06_distance_to_support_confidence" = "experiments/enrichments/tier6_distance.py"
+"results/enrichments/07_sample_size_vs_width" = "experiments/enrichments/compute_tier7.py"
+"results/enrichments/08_cross_dataset_correlates" = "experiments/enrichments/compute_tier8.py"
+"results/enrichments/09_signal_concentration" = "experiments/enrichments/compute_tier9.py"
+"results/enrichments/09_signal_concentration_16ds" = "experiments/enrichments/compute_tier9.py"
+"results/enrichments/10_independence_vs_sample_size" = "experiments/enrichments/compute_e2.py"
+"results/enrichments/10b_cross_axis_coherence" = "experiments/enrichments/compute_e3_ASRUN.py"
+"results/enrichments/11_recalibrator_flexibility_ladder" = "experiments/enrichments/compute_p2.py (cross-checked by _verify_p2.py)"
+"results/enrichments/13_safe_budget_diagnostic" = "experiments/enrichments/compute_p3_ASRUN.py"
+"results/enrichments/14_surviving_penalty_localisation" = "experiments/enrichments/compute_p4_ASRUN.py"
+"results/enrichments/15_matched_absolute_budget" = "experiments/enrichments/compute_p5_ASRUN.py"
+"results/enrichments/00_environment_gate" = "no compute step: the environment gate is a test-suite and hash check, recorded in the execution playbook"
 
 [not_run]  # V1 — scripts present but not exercised for this revision, declared with reasons.
 "experiments/make_graphical_abstract.py" = "graphical abstract not part of the SR revision package; not regenerated this round"

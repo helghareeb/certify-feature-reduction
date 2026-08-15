@@ -1,4 +1,4 @@
-# REVISION_NOTES — ns-clinical-fs, SR revision round 1 (2026-08-11 → deadline 2026-08-24)
+# REVISION_NOTES — certify-feature-reduction, SR revision round 1 (2026-08-11 → deadline 2026-08-24)
 
 > Per-paper working ledger (the `REVISION_NOTES.md` discipline from ns-fraud). Newest entries at
 > the bottom of each section. The point-by-point map lives in `RESPONSE.md`; this file holds the
@@ -149,10 +149,10 @@ The response-to-reviewers letter itself ships to SR as a submission file, not in
 - 2026-08-11 (final) — **PACKAGE READY.** Response letter (3pp, generated from RESPONSE.md, no
   salutation), MANIFEST.toml + LOCAL_EXECUTION_PLAYBOOK.md authored, R6 canonicalization
   (content_hash == file_bytes == stamp, .gitattributes-guarded), AUD-0 MECHANICAL ALL-PASS,
-  verdict drafted at hub AUDIT_ns-clinical-fs_2026-08-11.md with my read PASS on all six human
+  verdict drafted at hub AUDIT_certify-feature-reduction_2026-08-11.md with my read PASS on all six human
   gates — AUTHOR SIGNATURE PENDING (do not upload before signing; two papers shipped unsigned
   already). SR revision zip built per revision rules (NO manuscript PDF, separate figures, no
-  .bib, jabbrv bundled, response PDF included): paper/ns-clinical-fs_SR_revision.zip — ACID
+  .bib, jabbrv bundled, response PDF included): paper/certify-feature-reduction_SR_revision.zip — ACID
   PASS (0 err / 0 undef / 19pp, clean extract, TEXMFHOME hidden). REMAINING (author): 1) sign
   AUD-5..10 in the hub verdict; 2) upload the zip contents at the SR portal (manuscript source
   + separate figure PDFs + response_to_reviewers.pdf; NO main.pdf); 3) the public flip per the
@@ -250,7 +250,7 @@ rebuilt, 3 pp. `build_revision.sh`: **ACID PASS** (0/0/19 pp from a clean extrac
   clause in Fig 1; no structural change.
 - **A5. Untrack LaTeX build artifacts** (paper/*.aux, *.log, *.out, response_to_reviewers.aux)
   + gitignore them — the public flip should not ship build litter.
-- **A6. AFTER A1–A5 (compute):** pdflatex ×3 + rebuild ns-clinical-fs_SR_revision.zip +
+- **A6. AFTER A1–A5 (compute):** pdflatex ×3 + rebuild certify-feature-reduction_SR_revision.zip +
   acid test + pytest; verify abstract ≤200 by count; commit/push.
 
 ## ✅ RESOLVED 2026-08-12 — option (a) taken: reported, and the claim re-based

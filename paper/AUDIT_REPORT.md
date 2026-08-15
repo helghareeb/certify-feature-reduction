@@ -1,4 +1,4 @@
-# AUDIT REPORT — `ns-clinical-fs`, pre-resubmission audit
+# AUDIT REPORT — `certify-feature-reduction`, pre-resubmission audit
 
 **Paper:** *Aggressive feature reduction degrades the selective reliability and clinical net benefit
 of clinical risk models* · Scientific Reports submission `2650209c-ff1e-4df4-aeb0-75ef3b35e564`
@@ -162,6 +162,37 @@ Strict ancestry, verified with `git merge-base --is-ancestor` in both links. The
 **four hours before any code existed that could compute a flip rate**, and nineteen hours before a
 flip number reached the paper. Once the repository is public a reviewer can run the same two commands.
 
+
+### 3.8 The enrichment code, and a leak that was visible in exactly one place
+
+The Arm B finding prompted the obvious question — does anything else carry the same pattern? — and the
+answer was that we could not tell, because **one of eighteen enrichments had shipped its code.** The
+rest existed in this repository as numbers. That is now fixed: all twenty-one scripts and the frozen
+library copy they ran against are committed under `experiments/enrichments/`, and `AUD-1 (Produced)`
+was added to the gate so the gap cannot reopen silently.
+
+Every script was then read against three questions:
+
+1. Does any **label-informed** choice happen outside the cross-validation?
+2. Does any statistic computed on **all rows** enter a per-fold model?
+3. Are **imputation, ranking and standardisation** fitted on the training fold only?
+
+**Result: the leak was in P1 Arm B and nowhere else.** Two results are worth stating individually
+because the manuscript leans on them hardest:
+
+| experiment | what the code shows |
+|---|---|
+| **Tier 6** — the $-d$ confidence carrying "two-thirds of the harm is scale-borne" into the Abstract | **Clean.** The `BallTree` is built on `Xtr_z` — the training fold — and queried with the held-out rows; the source comment states it outright (*"held-out rows not in the tree"*). Imputation median and standardisation $\mu,\sigma$ are training-fold only |
+| **Tier 9** — the concentration index | **Clean.** The ranker scores are recomputed **inside each training fold** and averaged across folds; the index never sees a held-out row. A scan flagged the scoring *function* because it has no fold context of its own, and the *call site* is inside the fold loop |
+
+The remaining flags were false positives on inspection: an import line, a pandas rank-normalisation
+helper, a constant list, and a comment.
+
+**One asymmetry is worth recording rather than glossing.** Had Tier 9 or P3 been label-informed, it
+would have made their results *optimistic* — and both are **negative**. A predictor built with label
+knowledge that still fails to predict is a stronger negative, not a weaker one. They are not
+label-informed, so the point is moot here; but it is the direction to check first whenever a null
+result rests on a constructed predictor.
 
 ---
 
