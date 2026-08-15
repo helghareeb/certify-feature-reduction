@@ -47,6 +47,8 @@ skipped by expected row count; shard writes are atomic. Full-burn totals: 87 + 2
 | the three enrichment figures (recalibration ladder, cross-axis matrix, probe-injection dose-response) | `python experiments/make_enrichment_figures.py` (~5 s; committed CSVs only, fits nothing) |
 | cover letter plain-text version, generated from the .tex so the two cannot drift | `python experiments/mk_cover_txt.py` (run 2026-08-15; writes `paper/cover_letter.txt`, no manuscript number) |
 | public-compendium sync check (no manuscript number; `--check` exits non-zero if normalisation is due) | `python scripts/sync_public.py --check` (run 2026-08-16) |
+| results manifest (write / verify) | `python scripts/make_results_manifest.py [--check]` (run 2026-08-16) |
+| provenance map: every result -> its producing script | `python scripts/provenance_map.py --check` (run 2026-08-16) |
 | v1-vs-v2 invariance report | `python experiments/v1_v2_diff.py` |
 
 
@@ -65,6 +67,8 @@ here resolve the repository root from `__file__` so they run from a clone (`NSCL
 | `tier4_disagreement.py` | ensemble-disagreement confidence | fits models, in-fold |
 | `tier6_distance.py` | distance-to-training-support confidence | fits models; neighbours drawn from the training fold only |
 | `compute_tier7.py` | penalty versus $n$ at fixed $p$ | aggregation only |
+| `run_highdim.py` + `src/nsclinfs/highdim_data.py` | the high-dimensional grid (arcene, gli85, prostate_ge, arrhythmia) | registers the loaders and then **delegates to the frozen `run_clinical_fs.main()`** — it carries no evaluation logic of its own, so this arm inherits the audited pipeline verbatim |
+| `experiments/drivers/*.sh`, `_run_tier7.cmd` | the shell drivers that launched the high-dimensional and arrhythmia-subsampling runs | recorded as run |
 | `compute_tier8.py` | cross-dataset correlates, partials, LODO, bootstrap | analysis only |
 | `compute_tier9.py` | concentration index | scores recomputed per training fold |
 | `compute_e2.py` | independence versus cohort size | cache-only |

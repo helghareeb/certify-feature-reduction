@@ -161,7 +161,7 @@ columns = ["dataset", "method", "classifier", "budget", "calibrate", "rep"]
 # three leakage questions before this declaration was written; see AUDIT_REPORT.md.
 
 "results/enrichments/01_ece_bin_sensitivity" = "experiments/enrichments/compute_tier1.py + compute_tier1_materiality.py"
-"results/enrichments/02_high_dimensional_arm" = "experiments/enrichments/compute_tier7.py (the high-dimensional arm shares its loader and driver; the frozen library copy is experiments/enrichments/frozen_nsclinfs/highdim_data.py)"
+"results/enrichments/02_high_dimensional_arm" = "experiments/run_highdim.py (registers src/nsclinfs/highdim_data.py onto data.LOADERS, then delegates to the frozen run_clinical_fs.main(), so this arm carries no evaluation logic of its own); launched by experiments/drivers/run_highdim_grid.sh"
 "results/enrichments/03_recalibrators_beta_temperature" = "experiments/enrichments/tier3_run.py"
 "results/enrichments/04_ensemble_disagreement_confidence" = "experiments/enrichments/tier4_disagreement.py"
 "results/enrichments/05_gradient_boosting_bin_sweep" = "experiments/enrichments/compute_tier5.py + compute_tier5_materiality.py"
