@@ -3,10 +3,16 @@ Bounds the Tier-6 range of validity: the pooled Spearman(-d,|p-0.5|)=0.402 is do
 101k points. Report per-dataset independence and surviving AURC penalty AGAINST n -- never only pooled.
 Pure cache analysis (tier6_sanity.json + tier6_measurement_12ds.csv). Honest-negative-safe.
 """
+import os as _os
+# Repo root resolved from this file rather than hard-coded: the as-run copy carried an
+# absolute path to the machine that produced it. Override with NSCLINFS_REPO if needed.
+_REPO_ROOT = _os.environ.get('NSCLINFS_REPO') or _os.path.dirname(
+    _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+
 import json
 import numpy as np, pandas as pd
 from scipy import stats
-REPO = "C:/research/TASK-014/repo"
+REPO = _REPO_ROOT
 
 san = json.load(open(f"{REPO}/results/tier6_sanity.json"))["per_dataset"]
 meas = pd.read_csv(f"{REPO}/results/tier6_measurement_12ds.csv")

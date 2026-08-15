@@ -7,8 +7,14 @@ isotonic(nonparametric) -- and report RECOVERY (vs none) on three axes at full b
 Prediction (§4.8): ECE recovery RISES with flexibility while AURC/NB recovery stays ~0 across all rungs.
 Sources: summary_recalibration.csv (none/sigmoid/isotonic) + summary_tier3_{11ds,d130}.csv (none/beta/temp).
 """
+import os as _os
+# Repo root resolved from this file rather than hard-coded: the as-run copy carried an
+# absolute path to the machine that produced it. Override with NSCLINFS_REPO if needed.
+_REPO_ROOT = _os.environ.get('NSCLINFS_REPO') or _os.path.dirname(
+    _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+
 import pandas as pd, numpy as np, json
-R = "C:/research/TASK-014/repo/results"
+R = _os.path.join(_REPO_ROOT, "results")
 recal = pd.read_csv(f"{R}/summary_recalibration.csv", comment="#")
 t3 = pd.concat([pd.read_csv(f"{R}/summary_tier3_11ds.csv", comment="#"),
                 pd.read_csv(f"{R}/summary_tier3_d130.csv", comment="#")], ignore_index=True)

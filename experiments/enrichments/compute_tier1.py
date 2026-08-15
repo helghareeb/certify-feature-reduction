@@ -6,11 +6,17 @@ T1.3  AURC reduction penalty under confidence = |p-0.5| (margin), predictive ent
 Matches src/nsclinfs/metrics.py exactly for equal-width ECE and trapezoid AURC.
 Outputs: results/tier1/tier1_ece_binsweep.csv, tier1_aurc_confidence.csv, and prints a summary.
 """
+import os as _os
+# Repo root resolved from this file rather than hard-coded: the as-run copy carried an
+# absolute path to the machine that produced it. Override with NSCLINFS_REPO if needed.
+_REPO_ROOT = _os.environ.get('NSCLINFS_REPO') or _os.path.dirname(
+    _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+
 import glob, os, re, warnings
 import numpy as np, pandas as pd
 np.seterr(all="ignore"); warnings.filterwarnings("ignore")
 
-POOF = glob.glob(r"C:\research\TASK-014\repo\results\cache\poof\*.parquet")
+POOF = glob.glob(_os.path.join(_REPO_ROOT, "results/cache/poof/*.parquet"))
 FULL, RED = "frac:1", "frac:0.25"
 BINS = [5, 10, 15, 20, 30, 50]
 EPS = 1e-12
@@ -82,7 +88,7 @@ g = (ece.groupby(["classifier","calibrate","bin_type","bins"])
              frac_positive=("penalty", lambda s:(s>0).mean()), n=("penalty","size"),
              n_datasets=("dataset","nunique"))
         .reset_index())
-g.to_csv(r"C:\research\TASK-014\repo\results\tier1\tier1_ece_binsweep.csv", index=False)
+g.to_csv(_os.path.join(_REPO_ROOT, "results/tier1/tier1_ece_binsweep.csv"), index=False)
 
 # direction/materiality stability vs the bins=15 equal_width baseline (manuscript setting)
 print("\n=== T1.2 ECE reduction penalty (mean over 12ds x 3methods x 30reps) — direction check ===")
@@ -106,7 +112,7 @@ ga = (aur.groupby(["classifier","calibrate","confidence"])
          .agg(mean_penalty=("penalty","mean"), std=("penalty","std"),
               mean_aurc_full=("aurc_full","mean"), mean_aurc_red=("aurc_red","mean"), n=("penalty","size"))
          .reset_index())
-ga.to_csv(r"C:\research\TASK-014\repo\results\tier1\tier1_aurc_confidence.csv", index=False)
+ga.to_csv(_os.path.join(_REPO_ROOT, "results/tier1/tier1_aurc_confidence.csv"), index=False)
 print("\n=== T1.3 AURC reduction penalty by confidence measure (mean over all cells) ===")
 piv = ga.pivot_table(index=["classifier","calibrate"], columns="confidence", values="mean_penalty")
 print(piv.round(6).to_string())

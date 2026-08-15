@@ -5,13 +5,19 @@ Test: unit = (dataset, method); unit penalty = mean over 30 reps of [ECE_bin(fra
       one-sample t-test (and Wilcoxon) of unit penalties vs 0, per (classifier,calibrate,bin_type,bins);
       Holm correction across the 6 bin counts (the sweep family). Material if p_holm < stat_alpha.
 """
+import os as _os
+# Repo root resolved from this file rather than hard-coded: the as-run copy carried an
+# absolute path to the machine that produced it. Override with NSCLINFS_REPO if needed.
+_REPO_ROOT = _os.environ.get('NSCLINFS_REPO') or _os.path.dirname(
+    _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+
 import glob, os, json, warnings
 import numpy as np, pandas as pd
 from scipy import stats
 from statsmodels.stats.multitest import multipletests
 np.seterr(all="ignore"); warnings.filterwarnings("ignore")
 
-REPO = r"C:\research\TASK-014\repo"
+REPO = _REPO_ROOT
 POOF = glob.glob(os.path.join(REPO, r"results\cache\poof\*.parquet"))
 FULL, RED = "frac:1", "frac:0.25"
 BINS = [5,10,15,20,30,50]
