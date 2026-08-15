@@ -1,0 +1,989 @@
+%% Scientific Reports submission, official Springer Nature template (wlscirep.cls).
+\documentclass[fleqn,10pt]{wlscirep}
+
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{siunitx}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{subcaption}
+\usepackage{lineno}
+\usepackage{url}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,fit,backgrounds,calc}
+
+% Pipeline-diagram node styles
+\tikzset{
+  stage/.style={draw, rounded corners=2pt, align=center, font=\footnotesize,
+                fill=blue!4, minimum width=58mm, inner sep=4pt},
+  io/.style={draw, rounded corners=8pt, align=center, font=\footnotesize\bfseries,
+             fill=black!6, minimum width=58mm, inner sep=4pt},
+  flow/.style={-{Stealth[length=2mm]}, thick},
+}
+
+% Numbers in this manuscript are produced by one canonical aggregator
+% (a single canonical aggregator) and regenerate
+% end-to-end from committed code + calibration file + recorded seeds.
+\newcommand{\result}[1]{#1}
+
+\title{Aggressive feature reduction degrades the selective reliability and clinical net benefit of
+clinical risk models}
+
+\author[1,*]{Haitham A. El-Ghareeb}
+\affil[1]{Information Systems Department, Faculty of Computers and Information Sciences, Mansoura
+University, Mansoura, Egypt}
+\affil[*]{Corresponding author: helghareeb@mans.edu.eg}
+
+\keywords{feature selection; calibration; selective prediction; clinical risk prediction; algorithmic
+fairness; reproducibility}
+
+\begin{abstract}
+Feature reduction is widely adopted in clinical risk modelling, usually justified by a negligible loss
+of discrimination (AUROC). Discrimination, however, does not capture what a deployed risk model is
+relied upon for: clinicians act on calibrated probabilities, a triage model must order its own errors,
+and equitable care requires reliability across patient subgroups. We introduce a pre-registered,
+leakage-safe protocol that certifies a reduced model on these properties rather than on discrimination
+alone, and apply it to twelve public clinical datasets (\result{$n=155$--$6{,}000$}), three
+feature-ranking methods, and three learners, sweeping the retained-feature fraction from
+\result{100\,\%} to \result{25\,\%} with paired, multiplicity-corrected, bootstrapped comparisons. At a
+quarter of the features, degradation was material in most of the \result{108}
+dataset--ranker--learner cells: selective reliability worse in \result{93}, clinical net benefit in
+\result{78}, conformal set size larger in \result{80}, and discrimination in \result{90}, whereas
+calibration error and the subgroup gaps were mixed. The harm was dose-dependent and dataset-dependent,
+and post-hoc recalibration (Platt or isotonic) repaired only the random forest's calibration error,
+recovering none of the selective-reliability or net-benefit loss. Discrimination is therefore an
+insufficient safety certificate for a reduced model; calibration, selective reliability, clinical
+utility, and subgroup equity should be audited per dataset and learner.
+\end{abstract}
+
+\begin{document}
+
+\flushbottom
+\maketitle
+\thispagestyle{empty}
+\linenumbers
+
+\section{Introduction}
+\label{sec:intro}
+
+Predictive models built on tabular clinical data---heart-disease risk, diabetes onset,
+liver-disease screening, post-heart-failure mortality---are typically reported with a
+single headline of discrimination, most often the area under the receiver-operating
+characteristic curve (AUROC). When such models are deployed as decision support, however,
+discrimination is not the primary property a clinician relies on. A clinician reads a
+\emph{probability}---``this patient has an \result{18\,\%} risk''---and the value of that
+number depends on whether it is \emph{calibrated}: whether, among patients assigned an
+\result{18\,\%} risk, close to \result{18\,\%} actually experience the event. A model can
+rank patients well (high AUROC) and yet be badly calibrated, systematically over- or
+under-stating absolute risk, which is precisely the failure mode that misleads treatment
+thresholds.
+
+Feature reduction is an almost universal preprocessing step. Reducing the feature budget
+lowers data-collection cost and simplifies deployment, and is typically defended by showing
+that AUROC changes little when the model is restricted to the top-ranked features. This
+accuracy-centred justification, however, does not examine two properties of direct clinical
+importance: calibration and \emph{subgroup reliability}---whether calibration and discrimination
+hold equally across protected groups such as sex or age. These properties are seldom re-examined
+after features are dropped. If aggressive reduction degrades calibration or widens a subgroup gap
+while leaving AUROC almost intact, a model selected on the conventional evidence is less
+trustworthy and less equitable than its developers would infer from that evidence.
+
+This paper addresses that risk with a methodological contribution: not a new feature-selection
+method, but a reusable way to \emph{certify} a reduced model. The prevailing evaluation practice
+certifies feature reduction on discrimination (AUROC) alone; we replace it with a pre-registered,
+leakage-safe protocol that evaluates a reduced model on the properties a deployed risk score is
+actually trusted for---calibration, selective (risk--coverage) reliability, and between-subgroup
+equity. The protocol quantifies, as the fraction of retained features decreases, the change in
+calibration (expected calibration error, ECE, and the Brier score), in selective reliability (the area
+under the risk--coverage curve, AURC, which captures whether the model's own confidence can be trusted
+to triage which predictions to act on), in discrimination (AUROC), and in the between-subgroup gaps in
+AUROC and calibration. We fix the outcomes, the reduction levels, and the decision rule before
+examining any result, apply the protocol under a strict leakage firewall to twelve public datasets with
+three base learners and three ranking methods, and report results in both directions: the settings in
+which reduction is safe and those in which it is not.
+
+\paragraph{Contributions.}
+(i) A reusable, pre-registered, leakage-safe evaluation protocol that certifies a feature-reduced
+clinical risk model on calibration, selective reliability, and subgroup equity rather than on
+discrimination alone---the current state-of-the-art justification for feature reduction---with every
+number regenerable from committed code and recorded seeds. (ii) An instantiation across twelve public
+clinical datasets, three learners, and three rankers, showing the protocol reveals deployment-relevant
+degradation that discrimination-only evaluation misses, and that the harm is strongly conditional on
+dataset and learner---with an exploratory cross-dataset meta-analysis that turns this conditionality
+into an \emph{a priori} screen for when reduction is safe. (iii) A leakage-safe recalibration control, built into the protocol, that
+separates \emph{repairable} (calibration-error) from \emph{irreparable} (selective-reliability,
+Brier) harm, yielding an actionable, both-directions decision rule for practitioners.
+
+\section{Related work}
+\label{sec:related}
+
+\paragraph{Feature selection in clinical machine learning.}
+Filter, embedded, and wrapper feature-selection methods are standard in clinical prediction,
+and are conventionally evaluated by discrimination or classification accuracy at a reduced
+feature count \cite{guyon2003introduction,saeys2007review}. We use three widely adopted
+rankers as representative of this practice---a filter (mutual information), an embedded
+tree-importance ranker (random-forest Gini importance \cite{breiman2001random}), and an
+embedded sparse linear ranker ($L_1$-penalised logistic regression)---and treat the
+\emph{ranking} as given, auditing what its aggressive application costs.
+
+\paragraph{Calibration of risk models.}
+Calibration---the agreement between predicted probabilities and observed frequencies---is a
+long-standing requirement for clinical risk scores, quantified by the Brier score \cite{brier1950verification}
+and by binned expected calibration error \cite{niculescu2005predicting,guo2017calibration}.
+It is well established that good discrimination does not imply good
+calibration \cite{vancalster2019calibration}, and that prediction models should be judged by a
+framework of traditional and novel measures spanning discrimination, calibration, and clinical utility
+\cite{steyerberg2010assessing}. Our contribution is to treat calibration as a
+\emph{dependent variable of preprocessing}: we measure how it moves as features are removed,
+rather than measuring it once for a fixed model.
+
+\paragraph{Selective prediction and the risk--coverage trade-off.}
+Selective (reject-option) classification lets a model abstain on inputs it is least sure
+about \cite{elyaniv2010foundations}; its quality is summarised by the risk--coverage curve and
+its area (AURC), which is low when the model's confidence ranks its errors well
+\cite{geifman2017selective}. We include AURC because it captures a
+deployment-relevant property---can the model be trusted to triage its own predictions?---that
+neither AUROC nor a single calibration number expresses.
+
+\paragraph{Algorithmic fairness in health.}
+Subgroup performance gaps---differences in discrimination or calibration across protected
+groups such as sex or age---are a central concern for equitable clinical AI
+\cite{obermeyer2019dissecting,rajkomar2018ensuring}. Most audits fix the model and compare
+groups; we instead ask whether a routine engineering choice
+(feature reduction) \emph{widens} such gaps, connecting the fairness and preprocessing
+literatures.
+
+\paragraph{Gap.} To our knowledge these threads are not usually combined: feature reduction
+is justified on accuracy, while calibration, selective reliability, and subgroup gaps are
+audited---if at all---on the final model only. We close that gap with a single pre-registered
+protocol that tracks all four as a function of the feature budget.
+
+\section{Methods}
+\label{sec:methods}
+
+We formalise the audit as a reusable certification protocol whose architecture is summarised in
+Fig.~\ref{fig:pipeline} and specified in Algorithms~\ref{alg:certify} and~\ref{alg:decide}.
+Sections~\ref{sec:datasets}--\ref{sec:prereg} define each component; Section~\ref{sec:results}
+instantiates the protocol on twelve datasets, three learners, and three rankers. The protocol takes a
+clinical dataset and a feature-reduction configuration and returns, for every retained-feature budget,
+a direction-resolved verdict on each reliability axis, computed under a strict leakage firewall so
+that no information from a held-out patient can enter preprocessing. The protocol is designed to
+operationalise the calibration, clinical-utility, and fairness reporting items of TRIPOD+AI, the
+reporting standard for clinical prediction models using machine learning \cite{collins2024tripod}:
+it reports calibration (ECE, Brier) and clinical utility (decision-curve net benefit) alongside
+discrimination, examines performance across protected subgroups, and releases code and a
+pre-registration so that every reported quantity is reproducible. A completed adherence note is
+provided in the repository.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[node distance=3.6mm]
+\node[io] (data) {Clinical dataset $\mathcal{D}=(X,y,s)$:\\$n$ patients, $p$ candidate features,
+  protected attribute $s$};
+\node[stage, below=of data] (fold) {\textbf{Per repetition} $\times$ \textbf{stratified outer fold}
+  (training rows only):\\median imputation $\rightarrow$ feature ranking};
+\node[stage, below=of fold] (sweep) {\textbf{Retained-feature sweep:} for each budget keep the top
+  $k=\max(1,\operatorname{round}(\mathrm{frac}\cdot p))$\\ranked features, standardise on the training
+  fold, and fit the\\learner $f$ (optionally with an inner-CV Platt recalibration)};
+\node[io, below=of sweep] (oof) {Out-of-fold probabilities $\hat{p}$, pooled across folds};
+\node[stage, below=of oof] (eval) {\textbf{Multi-axis evaluation:} discrimination (AUROC) $\mid$
+  calibration\\(ECE, Brier) $\mid$ selective reliability (AURC) $\mid$ subgroup\\gaps
+  ($\Delta$AUROC, $\Delta$ECE)};
+\node[stage, below=of eval] (stat) {\textbf{Paired vs.\ full-feature baseline:} Holm correction $+$\\
+  5000-resample bootstrap CI $\rightarrow$ direction-resolved\\materiality (worse / better)};
+\node[io, below=of stat] (cert) {Per-budget reliability certificate};
+\foreach \a/\b in {data/fold,fold/sweep,sweep/oof,oof/eval,eval/stat,stat/cert}
+  \draw[flow] (\a) -- (\b);
+\begin{scope}[on background layer]
+\node[draw=red!55, dashed, rounded corners, fit=(fold)(sweep), inner sep=4pt] {};
+\end{scope}
+\end{tikzpicture}
+\caption{Architecture of the certification protocol. Imputation, feature ranking, standardisation,
+and model fitting all occur inside the training portion of each cross-validation fold (the dashed
+\emph{leakage firewall}); only out-of-fold probabilities are scored. Each reliability axis is compared,
+paired across repetitions, to the full-feature baseline and resolved into a materially-worse or
+materially-better verdict per budget.}
+\label{fig:pipeline}
+\end{figure}
+
+\subsection{Datasets}
+\label{sec:datasets}
+We use twelve public clinical tabular datasets (Table~\ref{tab:datasets}), spanning cardiology
+(Cleveland \cite{detrano1989international}, Statlog and SPECTF heart), oncology (the Wisconsin
+diagnostic \cite{street1993nuclear} and original breast-cancer datasets, mammographic mass, and
+Haberman survival), metabolic and hepatic disease (Pima diabetes \cite{smith1988using}, the Indian
+Liver Patient Dataset, hepatitis), post-heart-failure mortality \cite{chicco2020machine}, and a
+large real-world electronic-health-record cohort, the Diabetes 130-US hospitals dataset (early
+readmission). Each carries a binary outcome and, where available, a protected attribute that is
+\emph{never} used as a model feature. The datasets span two orders of magnitude in sample size
+($n=155$--$6{,}000$), feature counts from $p=3$ to $44$, outcome prevalences from $0.11$ to $0.79$,
+and protected attributes covering sex, gender, age, and (in the readmission cohort) race, so the
+audit is not tied to one clinical context and supports a cross-dataset meta-analysis
+(Section~\ref{sec:metasafe}).
+
+\begin{table}[t]
+\centering
+\caption{Datasets. Prevalence is the positive-class rate; $p$ is the number of model features
+(the protected attribute is excluded from the features). All are publicly available; see
+Data availability.}
+\label{tab:datasets}
+\input{datasets_table}
+\end{table}
+
+\paragraph{Clinical stakes.} Each outcome is acted on at a probability threshold, which is precisely
+why calibration and selective reliability---not ranking alone---matter clinically. On Cleveland,
+coronary-disease risk informs statin initiation and further cardiac testing, so a reduced model that
+over- or under-states absolute risk shifts which patients are treated; sex is the equity axis. Pima
+diabetes-onset risk drives preventive-intervention and screening decisions, where a deflated risk
+misses preventable onset; here the calibration--fairness gap is examined across an age stratum. ILPD
+liver-disease risk informs specialist referral, with gender as the equity axis. Heart-Failure
+mortality risk informs intensity-of-care and palliative-care discussions---a setting in which a model
+used to triage must properly order its own errors (AURC). WDBC malignancy probability governs whether a
+borderline case is flagged for human review; it carries no protected attribute and serves as the
+wide-feature, reduction-benign anchor. The Diabetes 130-US readmission cohort adds a large
+electronic-health-record setting in which a 30-day-readmission risk informs discharge and
+care-transition decisions, with \emph{race} as the equity axis across six groups---the most
+consequential fairness context in the study. The remaining datasets (Statlog and SPECTF heart,
+mammographic mass, Haberman survival, hepatitis, original breast cancer) extend the same
+threshold-decision logic to further diagnostic and prognostic tasks. Across these contexts, a
+miscalibrated reduced model, or one whose confidence no longer orders its errors, would misallocate
+the very decisions the score is intended to support.
+
+\subsection{Leakage-controlled protocol}
+For each (dataset, ranking method, base learner, repetition) we run stratified $k$-fold
+cross-validation ($k=5$). Within \emph{every} training fold, and using training data only, we
+(i) impute missing values by the training-fold median, (ii) rank all features by the chosen
+method, and (iii) for each retained fraction keep the top-$k$ features
+($k=\max(1,\operatorname{round}(\mathrm{frac}\times p))$), standardise them on the training fold,
+and fit the base learner. Out-of-fold probabilities are pooled once per (fraction) cell and scored. Because
+imputation, ranking, scaling, and model fitting all occur inside the training fold, no
+information from held-out patients can leak into preprocessing. The fraction of retained
+features is swept over $\{1.0, 0.75, 0.5, 0.33, 0.25\}$, and \emph{the same per-repetition
+cross-validation split is shared across all reduction levels}, so every reduced model is
+compared to its own full-feature baseline as a paired observation. Algorithm~\ref{alg:certify} states
+this per-configuration procedure precisely.
+
+\begin{algorithm}[t]
+\caption{\textsc{CertifyFeatureReduction}: leakage-safe per-configuration evaluation.}
+\label{alg:certify}
+\begin{algorithmic}[1]
+\Require dataset $(X,y,s)$ with $p$ features; ranker $m$; learner $f$; budgets $\mathcal{F}$;
+  repetitions $R$; folds $K$; master seed $\sigma$; recalibration mode $c\in\{\textsc{none},\textsc{platt}\}$
+\Ensure metric tensor $M[\mathrm{frac},\text{axis},r]$ over budgets, reliability axes, repetitions
+\For{$r \gets 1$ \textbf{to} $R$}
+  \State $\rho \gets \textsc{DeriveSeed}(\sigma, m, f, r)$ \Comment{seed shared across budgets $\Rightarrow$ paired}
+  \State $\{(\mathrm{tr}_\kappa,\mathrm{te}_\kappa)\}_{\kappa=1}^{K} \gets \textsc{StratifiedKFold}(X,y,K,\rho)$
+  \For{each fold $\kappa$} \Comment{training rows only: the leakage firewall}
+    \State $\mu_\kappa \gets \operatorname{median}(X_{\mathrm{tr}_\kappa})$;\quad
+      $\tilde X \gets \textsc{Impute}(X,\mu_\kappa)$;\quad
+      $\pi_\kappa \gets \textsc{Rank}_m(\tilde X_{\mathrm{tr}_\kappa}, y_{\mathrm{tr}_\kappa})$
+  \EndFor
+  \For{each budget $\mathrm{frac}\in\mathcal{F}$}
+    \State $k \gets \max\!\big(1,\operatorname{round}(\mathrm{frac}\cdot p)\big)$;\quad
+      $\hat p \gets$ undefined vector of length $n$
+    \For{each fold $\kappa$}
+      \State $S \gets \pi_\kappa[1{:}k]$ \Comment{top-$k$ ranked features}
+      \State $g \gets \textsc{Fit}\big(f, c,\, \textsc{Std}(\tilde X_{\mathrm{tr}_\kappa,S}),\, y_{\mathrm{tr}_\kappa}\big)$
+        \Comment{$c{=}\textsc{platt}${:} inner-CV recalibration}
+      \State $\hat p_{\mathrm{te}_\kappa} \gets g\!\big(\textsc{Std}(\tilde X_{\mathrm{te}_\kappa,S})\big)$
+        \Comment{standardisation fitted on $\mathrm{tr}_\kappa$}
+    \EndFor
+    \State $M[\mathrm{frac},\cdot,r] \gets
+      \big(\textsc{auroc},\textsc{ece},\textsc{brier},\textsc{aurc},\Delta^{s}_{\textsc{auroc}},
+      \Delta^{s}_{\textsc{ece}}\big)(y,\hat p,s)$
+  \EndFor
+\EndFor
+\State \Return $M$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Outcomes}
+Per cell we compute, all from the pooled out-of-fold probabilities (no extra model fits):
+\textbf{discrimination}---AUROC; \textbf{calibration}---15-bin expected calibration error (ECE) and the
+Brier score (lower is better for both); \textbf{selective reliability}---AURC, the area under the
+risk--coverage curve with confidence taken as $|p-0.5|$ (lower is better); \textbf{clinical
+utility}---the standardised decision-curve net benefit $\mathrm{NB}(t)=\tfrac{\mathrm{TP}}{n}-\tfrac{\mathrm{FP}}{n}\tfrac{t}{1-t}$
+averaged over the threshold range $t\in[0.05,0.5]$ (higher is better) \cite{vickers2006decision};
+\textbf{distribution-free reliability}---split-conformal prediction sets at 90\,\% nominal coverage,
+summarised by the mean set size (efficiency; lower is better); marginal coverage is approximately
+nominal (exactly so under exchangeability of the pooled out-of-fold scores), and because we compare the
+reduced and full-feature models built by the identical construction, our reported quantity is the
+\emph{paired} set-size difference, in which any departure from exchangeability is shared and largely
+cancels \cite{romano2020classification,angelopoulos2023conformal};
+\textbf{selective calibration}---ECE on the 80\,\% most-confident subset; and \textbf{subgroup
+gaps}---the between-group range (max minus min) of AUROC, ECE, net benefit, and conformal coverage
+across the protected attribute's groups (computed only where a group has at least ten samples and both
+classes present; undefined, and reported as such, for the three datasets without a protected
+attribute). The primary estimand is the \emph{paired difference} of each outcome at a reduced fraction
+versus the full-feature baseline; a positive ECE/Brier/AURC/set-size/gap difference, or a negative
+AUROC/net-benefit difference, means reduction \emph{degrades} that property.
+
+\subsection{Statistics}
+For each (dataset, method, learner, outcome) family across the reduced fractions, paired
+differences versus the full-feature baseline are tested with a two-sided Wilcoxon signed-rank
+test and corrected for multiple comparisons by the Holm step-down procedure
+\cite{holm1979simple} (R3). We use the non-parametric Wilcoxon test, rather than a paired $t$-test,
+because the per-cell paired differences across heterogeneous datasets are not assumed to be normally
+distributed and the test is robust to outliers; the alpha level is $0.05$ throughout. Each
+difference carries a 5000-resample percentile bootstrap confidence interval (R12). A difference
+is called \emph{material} only if its Holm-corrected $p<0.05$ \emph{and} its bootstrap CI
+excludes zero, and is then resolved by the sign of the paired difference into materially
+\emph{worse} or materially \emph{better} (Algorithm~\ref{alg:decide}). Holm correction thus controls
+the family-wise error rate \emph{within} each (dataset, method, learner, outcome) family across the
+four reduced budgets; the aggregate worse/better cell counts we report across the 108 cells are
+descriptive summaries of these per-family verdicts, not a single study-wide family-wise claim, and we
+read them as a consistent pattern of degradation rather than as one global hypothesis test. Headline
+numbers use \result{30} repetitions per cell (R4).
+
+\begin{algorithm}[t]
+\caption{\textsc{AggregateAndDecide}: direction-resolved materiality.}
+\label{alg:decide}
+\begin{algorithmic}[1]
+\Require metrics $M$ (Alg.~\ref{alg:certify}) for all configurations; reference budget
+  $\mathrm{frac}_0{=}1.0$; level $\alpha{=}0.05$; resamples $B{=}5000$; per-axis degradation sign
+  $\delta_o\in\{+1,-1\}$
+\Ensure verdict $\in\{\textsc{worse},\textsc{better},\textsc{n.s.}\}$ per (configuration, budget, axis)
+\For{each configuration and axis $o$}
+  \State $P \gets \langle\rangle$ \Comment{ordered raw $p$-values for the Holm family}
+  \For{each budget $\mathrm{frac}\neq\mathrm{frac}_0$}
+    \State $d \gets M[\mathrm{frac},o,\cdot] - M[\mathrm{frac}_0,o,\cdot]$
+      \Comment{paired across repetitions}
+    \State $p_{\mathrm{raw}} \gets \textsc{Wilcoxon}(d)$;\quad
+      $[\ell,u]\gets\textsc{BootstrapCI}(d,B)$;\quad append $p_{\mathrm{raw}}$ to $P$
+  \EndFor
+  \State $\{p_{\mathrm{holm}}\} \gets \textsc{HolmStepDown}(P)$
+  \For{each budget $\mathrm{frac}\neq\mathrm{frac}_0$}
+    \State $\mathit{material} \gets (p_{\mathrm{holm}}<\alpha) \,\wedge\, (0\notin[\ell,u])$
+    \If{$\mathit{material}\,\wedge\,(\operatorname{sign}(\bar d)=\delta_o)$} verdict $\gets \textsc{worse}$
+    \ElsIf{$\mathit{material}$} verdict $\gets \textsc{better}$
+    \Else{} verdict $\gets \textsc{n.s.}$
+    \EndIf
+  \EndFor
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Pre-registration and reproducibility}
+\label{sec:prereg}
+Outcomes, reduction levels, and the materiality rule were frozen before any result was read, in a deposited pre-registration. The study follows a fixed set of reproducibility rules:
+no number appears unless it regenerates end-to-end from committed code, the calibration file,
+and a recorded seed (R1); all tables derive from a single canonical aggregator (R2); each cell
+uses a deterministic per-cell seed (R5); the SHA-256 of the calibration file is embedded in
+every results CSV and downstream analysis refuses to mix mismatched hashes (R6); raw
+per-trial outputs are released in summary form with validated/provisional status tags (N14).
+
+\section{Results}
+\label{sec:results}
+
+All numbers below are the paired difference of an outcome at a reduced feature budget versus
+the full-feature model, averaged over the twelve datasets, three rankers, and three learners unless
+stated otherwise; a cell is one (dataset, ranker, learner) combination---\result{108} in total---and
+is \emph{material} when its Holm-corrected $p<0.05$ and its 5000-bootstrap CI excludes zero.
+
+\subsection{Degradation is dose-dependent}
+Table~\ref{tab:headline} reports the most aggressive budget (25\,\% of features). At that level,
+selective reliability, discrimination, clinical net benefit, and conformal informativeness are
+materially worse than the full-feature model in the large majority of the \result{108} cells (AURC in
+\result{93}, AUROC in \result{90}, decision-curve net benefit in \result{78}, conformal set size
+larger in \result{80}, and the Brier score in \result{77}), while probability calibration is
+mixed (ECE materially worse in \result{42}, better in \result{39}). The effect grows monotonically as
+features are removed (Fig.~\ref{fig:curves}): the mean AURC penalty rises from \result{$+0.002$} at
+75\,\% of features (materially worse in \result{50} of \result{108} cells) to \result{$+0.032$} at
+25\,\% (\result{93} of \result{108}), and the AUROC drop from \result{$-0.002$} to \result{$-0.039$}
+(\result{45} then \result{90} of \result{108}), with net benefit tracking the same trajectory
+(\result{$-0.001$} to \result{$-0.012$}).
+
+\begin{table}[t]
+\centering
+\caption{Paired difference at 25\,\% of features versus the full-feature model (mean over the
+twelve datasets, three rankers, and three learners; positive ECE/Brier/AURC/gap values indicate
+degradation, positive AUROC/net-benefit values indicate improvement). The two right columns split the
+Holm-significant cells
+(bootstrap CI excluding zero) by the direction of the difference into materially \emph{worse} and
+materially \emph{better}; for the subgroup gaps, a widening counts as worse. Computed from the released
+per-configuration result summary.}
+\label{tab:headline}
+\input{headline_table}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/reduction_curves.pdf}
+\caption{Calibration (ECE), selective reliability (AURC), and discrimination (AUROC) as a
+function of the fraction of features retained. The horizontal axis is reversed, so more aggressive
+reduction is to the right; one line per dataset, averaged over rankers and learners. Degradation
+emerges earliest and most steeply on the low-dimensional datasets (mammographic mass, Haberman, Statlog
+and Cleveland heart), whereas the wide-feature datasets (WDBC, SPECTF) and the large readmission cohort
+show minimal change---a pattern quantified by the meta-analysis (Section~\ref{sec:metasafe}).}
+\label{fig:curves}
+\end{figure}
+
+\subsection{Calibration and selective reliability do not merely track discrimination}
+A natural hypothesis is that the selective-reliability and net-benefit loss is attributable to the
+discrimination loss alone. Three observations argue against this. First, the reliability loss matches or
+exceeds the discrimination loss in extent: AURC is materially worse in \result{93} of \result{108} cells
+and net benefit in \result{78}, against \result{90} for AUROC, with the Brier score comparable
+(\result{77}); the degradation thus extends beyond ranking. Second, the axes decouple: at every budget there are
+cells in which calibration or selective reliability is materially worse while AUROC is not (\result{16},
+\result{11}, \result{12}, and \result{6} of \result{108} at the 75, 50, 33, and 25\,\% budgets;
+Table~\ref{tab:silent}), largest at the mildest budget---the regime in which reduction is applied most
+readily. Third, probability calibration error behaves differently from the rest: across the twelve
+datasets ECE is mixed (materially worse in \result{42} cells but better in \result{39} at
+the most aggressive budget), whereas selective reliability, net benefit, and the Brier score degrade
+consistently. On several datasets aggressive reduction even \emph{improves} the calibration error while
+degrading the model's selective reliability and clinical net benefit---so calibration error and the
+deployment-relevant reliability of the model's own confidence are distinct properties, and an audit
+that checks only one can miss the other.
+
+\begin{table}[t]
+\centering
+\caption{Cells (dataset, ranker, learner) in which calibration or selective reliability (ECE, Brier,
+or AURC) degrades materially while AUROC does not, by retained-feature fraction. These dissociations
+are infrequent and concentrated at mild reduction levels, where AUROC itself rarely changes materially.
+Computed from the released per-configuration result summary.}
+\label{tab:silent}
+\input{silent_cells}
+\end{table}
+
+\subsection{The harm varies substantially across datasets}
+The harm is far from uniform (Fig.~\ref{fig:curves}, Table~\ref{tab:perdataset}). At 25\,\% of
+features the AURC penalty spans more than a thirty-fold range, from \result{$+0.070$} on mammographic mass and
+\result{$+0.068$} on Statlog heart down to \result{$+0.002$} on SPECTF and \result{$+0.003$} on WDBC.
+The robust datasets are those with many candidate features (WDBC, 30; SPECTF, 44; the readmission
+cohort, 16), so a quarter still spans the signal; the harmed datasets have few features (mammographic,
+5; Haberman, 3; Statlog and Cleveland, 12), each carrying largely unique signal that reduction cannot
+afford to discard. The pattern is therefore conditional: aggressive reduction is comparatively benign
+when the retained budget still spans the predictive signal and harmful when it does not---a relationship
+the next section makes quantitative and predictive.
+
+\begin{table}[t]
+\centering
+\caption{Mean paired difference versus the full-feature model at 25\,\% of features, per dataset
+(averaged over rankers and learners; positive ECE/Brier/AURC values indicate degradation, as do
+negative AUROC values). Computed from the released per-configuration result summary.}
+\label{tab:perdataset}
+\input{per_dataset_table}
+\end{table}
+
+\subsection{Fragility is learner-dependent}
+The fragility is not the same across the three learners. At 25\,\% of features the random forest is
+the most fragile on every axis (AURC \result{$+0.048$}, ECE \result{$+0.022$}, net benefit
+\result{$-0.019$}, AUROC \result{$-0.054$}); logistic regression is the most robust on selective
+reliability (AURC \result{$+0.019$}); and gradient boosting is intermediate on reliability (AURC
+\result{$+0.028$}) but distinctive on calibration---its ECE actually \emph{improves} under reduction
+(\result{$-0.018$}). This learner-level split is what makes the pooled ECE result mixed: the boosted
+model's already-sharp probabilities tend to tighten as redundant features are dropped, while the
+forest's loosen. The random-forest comparison also carries a confound, since forests produce
+less well-calibrated probabilities out of the box, inflating their apparent ECE penalty. The
+recalibration control in Section~\ref{sec:recal} disentangles it, showing that most of the forest's
+extra calibration-error penalty is an artifact of its uncalibrated probability scale---while the
+selective-reliability penalty, shared by all three learners, is not.
+
+\subsection{Subgroup gaps: a dataset-specific, not systematic, fairness signal}
+Across the nine datasets that carry a protected attribute, the subgroup gaps do \emph{not} move in a
+single direction. At the most aggressive budget the calibration-fairness gap (ECE gap) is essentially a
+wash on average (\result{$-0.002$}), materially widening in \result{19} of \result{72} cells and
+narrowing in \result{23}; the AUROC subgroup gap is similar (\result{$+0.002$} mean; \result{16}
+widen, \result{21} narrow). The two new fairness axes agree: the net-benefit parity gap
+\cite{pfohl2022net} widens in
+\result{18} of \result{72} group-bearing cells and narrows in \result{25}, and the group-conditional
+conformal coverage gap widens in \result{21} of \result{81} and narrows in \result{15}. The honest
+reading is that aggressive reduction \emph{can} widen a fairness gap---and does so materially on
+individual datasets (most consequentially in the race-stratified readmission cohort, where any widening
+is clinically salient)---but it does not do so systematically across the broader dataset set. Fairness
+under reduction is therefore a per-dataset audit item, not a property that can be assumed in either
+direction.
+
+\subsection{Reduction reduces clinical utility and conformal informativeness}
+Two of the new axes translate the abstract reliability loss into clinically actionable quantities, and
+both degrade (Table~\ref{tab:newaxes}). Decision-curve net benefit \cite{vickers2006decision}---the
+standardised benefit of acting on the score, averaged over a clinically relevant threshold range---is
+materially lower at 25\,\% of features in \result{78} of \result{108} cells (mean \result{$-0.012$}),
+so a reduced model with preserved AUROC nonetheless yields fewer correct
+treatment or non-treatment decisions per patient. Split-conformal prediction sets
+\cite{romano2020classification,angelopoulos2023conformal}, calibrated to 90\,\% coverage from the
+out-of-fold scores, become less informative: the mean set size grows in \result{80} of \result{108}
+cells (\result{$+0.070$})---the reduced model must more often return the uninformative two-label set to
+keep its coverage guarantee. Because marginal coverage is held at the nominal 90\,\% by construction,
+set size, not coverage, is the informative axis. Selective calibration---ECE on the 80\,\% of patients
+the model is most confident about---is mixed (worse in \result{45} cells, better in \result{41}),
+echoing the pooled ECE result: in the high-confidence region on which clinicians most rely, aggressive
+reduction improves and degrades calibration with approximately equal frequency, even as it consistently
+reduces net benefit and conformal informativeness.
+
+\begin{table}[t]
+\centering
+\caption{The four new reliability axes at 25\,\% of features versus the full-feature model (mean over
+twelve datasets, three rankers, three learners; the gaps are over the nine group-bearing datasets---the
+ECE, AUROC, and net-benefit gaps over the eight with a valid two-class subgroup, 72 cells, and the
+conformal-coverage gap over all nine, 81 cells). Net benefit is a clinical-utility gain ($\uparrow$
+better); the others are costs ($\downarrow$ better). Computed from the released per-configuration result summary.}
+\label{tab:newaxes}
+\input{new_axes_table}
+\end{table}
+
+\subsection{Predicting when aggressive reduction is safe: a cross-dataset screen}
+\label{sec:metasafe}
+The harm varies by more than thirty-fold across datasets, and this variation is itself predictable.
+Taking each dataset's AURC penalty at 25\,\% of features as the response and relating it to intrinsic
+dataset properties
+(Table~\ref{tab:meta}, Fig.~\ref{fig:meta}), the harm is most strongly predicted by the
+\emph{feature count}: datasets with more candidate features are reliably safer to reduce (Spearman
+$\rho=\result{-0.73}$, $p=\result{0.007}$). The \emph{intrinsic dimensionality}---the fraction of
+principal components needed to capture 95\,\% of the feature variance---is the second predictor
+($\rho=\result{+0.64}$, $p=\result{0.024}$): harm is greatest when the predictive signal is spread
+across many components and least when it is concentrated in a few. The sample-to-feature ratio,
+feature redundancy, and outcome prevalence are not significant predictors. With only twelve datasets
+this analysis is exploratory and we treat it as hypothesis-generating: of the five candidate
+predictors, the feature-count association survives a Bonferroni correction for multiplicity
+($p=\result{0.007}$, i.e.\ $<0.05/5$), whereas the intrinsic-dimension association does not
+($p=\result{0.024}$) and is reported as corroborating rather than independent evidence. With this
+caveat, the practical screening criterion is that aggressive reduction is comparatively safe when a
+dataset has many features whose signal is concentrated (high $p$, low intrinsic dimension), so that a
+quarter of them still spans the predictive subspace, and harmful when it has few features each carrying
+unique, non-redundant signal. This criterion matches the empirical contrast between the wide WDBC,
+SPECTF, and readmission datasets (negligible harm) and the compact mammographic, Haberman, and Statlog
+datasets (largest harm), and it provides an \emph{a priori} indication of whether reduction is
+appropriate before empirical evaluation; without it, identifying the damaging regime requires measuring
+the reliability axes this protocol audits.
+
+\begin{table}[t]
+\centering
+\caption{Dataset properties and the reliability harm (AURC penalty at 25\,\% of features), sorted by
+harm. The harm is predicted by the feature count ($p$) and the intrinsic-dim fraction (see text).
+Computed from the released per-configuration result summary and the dataset definitions.}
+\label{tab:meta}
+\input{meta_table}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.62\textwidth]{figures/meta_harm.pdf}
+\caption{Reliability harm (AURC penalty at 25\,\% of features) versus the strongest predictor, the
+feature count, one point per dataset. Harm falls as the number of candidate features grows: wide
+datasets tolerate aggressive reduction; compact ones do not.}
+\label{fig:meta}
+\end{figure}
+
+\subsection{Recalibration recovers the calibration error, but not the selective-reliability or
+net-benefit loss}
+\label{sec:recal}
+A standard approach to a calibration problem is post-hoc recalibration, which we evaluate as a control
+at two depths. In a separate, leakage-safe experiment we wrapped each base learner in either Platt
+(sigmoid) scaling or the more flexible isotonic regression, each fitted by an inner 3-fold
+cross-validation \emph{within} each training fold---so the calibrator never sees the outer held-out
+fold---and recomputed the reduction penalty at the full and 25\,\% budgets (Table~\ref{tab:recal}). The
+result is a dissociation with a learner-specific calibration component. Where a raw
+calibration-\emph{error} penalty exists, recalibration removes it: the random forest's ECE penalty
+collapses from \result{$+0.016$} to \result{$+0.000$} (Platt) and \result{$+0.002$} (isotonic),
+confirming that the forest's apparent fragility is largely its uncalibrated probability scale rather
+than reduction itself. For logistic regression the raw ECE penalty is already small, and for gradient
+boosting it is negative (reduction \emph{improves} its calibration), so little remains to recover and
+recalibration leaves the pooled ECE essentially unchanged. However, the deployment-relevant penalties
+\emph{persist} under recalibration at both depths and for every learner: the pooled AURC penalty moves
+only from \result{$+0.029$} (raw) to \result{$+0.028$} (Platt) and \result{$+0.026$} (isotonic), the
+random forest's from \result{$+0.046$} (raw) to \result{$+0.038$} (Platt) and \result{$+0.033$}
+(isotonic), still materially worse in \result{12} of \result{12} and \result{11} of \result{12} cells
+respectively, with comparable persistence in the Brier and net-benefit penalties. Notably,
+isotonic regression---the more flexible recalibrator---does not recover them either, indicating that the
+failure to recover is not attributable to limited recalibration flexibility. Recalibration thus fixes the part of the problem that is a
+relabelling of probabilities, but not the part that is a loss of the model's ability to rank its own
+errors and to deliver clinical net benefit---the property selective prediction and threshold-based
+decision-making depend on. For tractability this recalibration-depth control uses a single ranker
+(mutual information) rather than all three; because the raw AURC penalty is of comparable magnitude
+across the three rankers in the main grid, we expect the dissociation to hold for the others, but
+running the full $\{$none, Platt, isotonic$\}$ grid for every ranker is left to future work.
+
+\begin{table}[t]
+\centering
+\caption{Raw versus leakage-safe Platt- and isotonic-recalibrated reduction penalty at 25\,\% of
+features (mean paired difference vs.\ full over the twelve datasets, the mutual-information ranker, and
+three learners; positive ECE/Brier/AURC values indicate degradation, as do negative AUROC/net-benefit
+values), with
+the count of materially worse cells. Recalibration recovers the (learner-specific) calibration-error
+penalty but not the AURC, Brier, or net-benefit loss, and isotonic does no better than Platt.
+Computed from the released recalibration-control summary.}
+\label{tab:recal}
+\input{recalibration_table}
+\end{table}
+
+\section{Discussion}
+\label{sec:discussion}
+
+The audit demonstrates that the discrimination of a reduced model is an insufficient certificate of its
+safety. Across twelve public clinical datasets, three learners,
+and three standard rankers, reducing the feature budget was associated, at aggressive cuts, with
+degraded selective reliability (AURC, worse in 93 of 108 cells), reduced clinical net benefit (78 of
+108), and larger, less informative conformal prediction sets (80 of 108): a loss comparable in extent
+to, and partly independent of, the loss of discrimination, and present in cells where discrimination
+remained materially preserved. Probability calibration, by contrast, was mixed across the broader
+dataset set: aggressive reduction improved and degraded the calibration error with approximately equal
+frequency, driven by the gradient-boosted learner whose sharp probabilities tightened as redundant
+features were dropped. The deployment-relevant harms---degradation in the trustworthiness of the
+model's confidence and in the net benefit of acting on it---are therefore the most robust signal, and
+none of them is visible to the AUROC-only evaluation by which feature reduction is usually justified.
+
+\paragraph{Why selective reliability matters here.} AURC summarises whether a model's own
+confidence can be trusted to triage which predictions to act on. A reduced model with a larger
+AURC is one whose abstention or referral behaviour is less dependable---a property of direct
+operational relevance in decision support, and one that neither AUROC nor a single calibration
+number captures. That AURC degrades early and steeply under reduction (Fig.~\ref{fig:curves}) is the
+most deployment-relevant property the protocol exposes.
+
+\paragraph{Conditions under which reduction is safe.} The extent and direction of degradation are
+dataset-dependent rather than intrinsic to feature reduction. The cross-dataset meta-analysis
+(Section~\ref{sec:metasafe}) shows the harm is predicted by the feature count and the intrinsic
+dimensionality (Spearman $\rho=-0.73$ and $+0.64$): reduction is comparatively safe on wide datasets
+whose signal is concentrated in a few components---a quarter of the features still spans the predictive
+subspace---and harmful on compact datasets where each feature carries unique signal. This provides an
+\emph{a priori} criterion: whether a dataset lies in the safe or the damaging regime can be determined
+before committing to reduction, rather than only by auditing the reduced model. It also delimits the
+scope of the claim. We do not assert that feature reduction is universally harmful; rather, aggressive
+reduction on compact, low-redundancy clinical datasets degrades reliability in ways that discrimination
+alone does not reveal, and this regime is predictable in advance.
+
+\paragraph{Practical guidance.} When feature reduction is being considered, calibration (Brier
+and ECE), selective reliability (the risk--coverage curve), clinical net benefit (a decision curve),
+distribution-free set size (conformal efficiency), and subgroup gaps should be reported
+for each candidate budget alongside discrimination, on the same paired cross-validation splits we
+use here. Because the harm is heterogeneous but predictable, the decision should be made per dataset
+and per learner---guided by the feature-count / intrinsic-dimension screen above---rather than by a
+single global rule. Where the calibration-\emph{error} component is the primary concern,
+post-hoc recalibration of the reduced model is an effective and computationally inexpensive mitigation
+(Section~\ref{sec:recal}), and is particularly important for tree ensembles, whose ECE penalty is
+largely attributable to baseline miscalibration. However, recalibration is not a substitute for
+retaining the features: it does not restore the selective-reliability (AURC) or Brier loss, so where the
+model's confidence will be used to triage or defer, feature reduction itself must be reconsidered rather
+than corrected post hoc.
+
+\paragraph{Relation to prior work.} The individual ingredients---feature rankers, calibration
+metrics, selective-prediction machinery, subgroup gaps---are all standard, and we deliberately use
+established forms of each so the protocol inherits their validity. The methodological contribution is
+their composition into a single pre-registered, leakage-safe certification protocol that treats
+calibration, selective reliability, and subgroup equity as \emph{dependent variables of the reduction
+level}, rather than evaluating a final model once on discrimination. It constitutes a reusable
+evaluation methodology for a recurring clinical-informatics decision---how aggressively to reduce
+features---assessed on the axes that govern deployment. We do not claim superiority for any
+classifier; the deliverable is the evaluation methodology and the generalizable lesson it yields.
+
+\subsection{Limitations and threats to validity}
+\label{sec:threats}
+
+\paragraph{Construct.} ECE is binning-dependent; we fix 15 equal-width bins a priori, treat the
+binning-free Brier score as the primary calibration outcome (and Brier and ECE agree in
+direction throughout), and did not run a bin-count sensitivity sweep. AURC uses confidence
+$|p-0.5|$, a monotone function of the predicted probability itself; selective reliability and
+calibration are therefore not fully independent and are expected to co-move, so we do not treat
+AURC as separate evidence of the calibration effect---its value is that it degrades while AUROC
+stays flat, not that it is statistically independent of ECE/Brier. Subgroup gaps use a coarse
+protected attribute (sex, gender, or a binary age split) and a minimum subgroup size, so they
+are conservative; following SAGER guidance we note that these attributes are recorded only as
+binary categories, that sex and gender are not distinguished in the source data, and that a finer
+sex- and gender-based analysis was not possible with these public datasets. The base learners are reported uncalibrated in the main analysis, which confounds
+the random forest's larger ECE penalty with its known baseline miscalibration; the leakage-safe
+recalibration control (Section~\ref{sec:recal}) disambiguates this and shows the forest's extra ECE
+penalty is largely a recalibration artifact, while the AURC penalty is not.
+
+\paragraph{Internal.} The leakage firewall (in-fold imputation, ranking, scaling, fitting) is
+enforced by a test that shuffling the labels collapses AUROC to chance. Paired, split-shared
+comparisons remove between-split variance from the reduction effect.
+
+\paragraph{External.} The twelve public datasets cover several clinical contexts but are mostly modest
+in size ($n=155$--$6{,}000$, with only the readmission cohort large) and low-to-moderate dimensional
+($p=3$--$44$), and are not prospective; absolute effect sizes may differ on larger or temporally split
+cohorts. In particular, the high-dimensional regime ($p\gg44$, e.g.\ genomics or wide EHR feature sets)
+where aggressive
+reduction is most common is out of scope here, and the claims are scoped to low/moderate
+-dimensional tabular clinical data. The protected attributes available limit the fairness
+analysis to the recorded groups, and the Diabetes-130 readmission cohort---the study's most
+consequential fairness context---is deterministically subsampled to $6{,}000$ encounters for
+tractability, which reduces statistical power for the smallest race subgroups; its fairness numbers
+should be read as indicative rather than definitive.
+
+\paragraph{Statistical.} Wilcoxon plus Holm controls family-wise error within each
+(dataset, method, learner, outcome) family across the feature budgets; the aggregate cell counts we
+report are descriptive summaries across those families, not a single study-wide family-wise test. The
+cross-dataset meta-analysis ($n=12$) is exploratory; only the feature-count predictor survives
+multiplicity correction. Bootstrap CIs quantify effect-size uncertainty, and we report materiality
+(significance \emph{and} a CI excluding zero), not significance alone.
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+In a pre-registered, leakage-controlled audit on twelve public clinical datasets, aggressive
+feature reduction degraded selective reliability, clinical net benefit, and conformal informativeness
+at least as much as discrimination---dose-dependently, most severely for random forests, and in a set
+of settings while discrimination remained materially preserved---while probability calibration was
+mixed across datasets and the subgroup gaps moved in no systematic direction. Importantly, the harm was
+strongly conditional on the dataset yet \emph{predictable}: a cross-dataset meta-analysis shows it is
+governed by the feature count and intrinsic dimensionality, so reduction is comparatively safe on wide,
+low-intrinsic-dimension datasets and harmful on compact ones. The practical conclusion is that
+calibration, selective reliability, net benefit, and subgroup gaps should be audited explicitly, per
+dataset and per learner, before a reduced feature set is adopted, as the discrimination of the
+reduced model does not reveal them, and that the feature-count and intrinsic-dimension screen can
+identify the damaging regime in advance. Post-hoc recalibration repairs the calibration-error
+component but not the selective-reliability or net-benefit loss, and is therefore a limited mitigation.
+Future work should include prospective and temporally split validation. All code, the calibration file, the
+pre-registration, and the per-configuration summary are released so that every number regenerates from
+a recorded seed.
+
+\section*{Ethics statement}
+This study used only publicly available, fully de-identified secondary datasets and involved no
+intervention or interaction with human participants and no access to identifiable private
+information. It therefore does not constitute human-subjects research and was exempt from
+institutional review board approval.
+
+\section*{Data availability}
+All twelve datasets are public and were retrieved in June 2026. Ten are from the UCI Machine Learning
+Repository, cited by dataset identifier: Cleveland heart disease (45), Statlog heart (145), SPECTF
+heart (96), Hepatitis (46), Indian Liver Patient (225), Mammographic Mass (161), Haberman survival
+(43), Breast Cancer Wisconsin original (15), and the Diabetes 130-US hospitals readmission cohort
+(296, \url{https://archive.ics.uci.edu/dataset/296}); the Heart-Failure clinical records dataset is
+UCI 519. The Pima Indians diabetes data (originally Smith et al., 1988) and the Wisconsin Diagnostic
+Breast Cancer dataset (originally Street et al., 1993; bundled with the scikit-learn library) are likewise public. The Diabetes-130 cohort is
+deterministically stratified-subsampled to $n=6{,}000$ (seed recorded) for tractability. Per-dataset
+provenance (source, URL, retrieval date, preprocessing) is documented in the project repository. Raw files are not redistributed; the released code reproduces the exact
+preprocessing.
+
+\section*{Code availability}
+All code, the calibration file, the pre-registration, and the per-configuration result summaries are
+available in the project repository at \url{https://github.com/helghareeb/ns-clinical-fs}, with a documented reproduction entry point; every number in this paper regenerates from committed code, the
+calibration file, and the recorded seed. The repository is currently private and is available to the
+editors and reviewers for inspection on request during peer review; it will be made publicly accessible
+upon acceptance.
+
+\section*{Sex and gender}
+Sex (Cleveland, Statlog and Heart-Failure heart, Hepatitis), gender (ILPD), an age stratum (Pima,
+Haberman, Mammographic), and race (the Diabetes-130 readmission cohort, six groups) are used in this
+study \emph{only} as protected attributes for the subgroup-equity analysis and are never model
+features; the WDBC, original breast-cancer, and SPECTF datasets carry no protected attribute. We
+report between-subgroup calibration, discrimination, net-benefit, and conformal-coverage gaps as a
+function of feature reduction. Following SAGER guidance, we note as a limitation that most attributes
+are recorded as coarse binary categories, that sex and gender are not distinguished in the source
+data, and that a finer sex- and gender-based analysis was not possible with these datasets.
+
+\section*{Funding}
+This research did not receive any specific grant from funding agencies in the public, commercial, or
+not-for-profit sectors.
+
+\section*{Competing interests}
+The author declares no competing interests.
+
+\section*{Author contributions}
+H.A.E. is the sole author. H.A.E. conceived and designed the study, implemented the software, performed
+the experiments, analysed the data, prepared the figures, and wrote and reviewed the manuscript.
+
+\section*{Use of large language models}
+During the preparation of this work the author used an AI coding assistant (Claude Code) in order to
+support software-engineering and manuscript-preparation tasks. After using this tool the author
+reviewed and edited the content as needed and takes full responsibility for the content of the
+published article.
+
+% References inlined (Scientific Reports compiles the submitted .tex and does not re-run
+% BibTeX). Regenerate with: bibtex main (naturemag-doi.bst) then paste main.bbl here.
+\begin{thebibliography}{10}
+\expandafter\ifx\csname url\endcsname\relax
+  \def\url#1{\texttt{#1}}\fi
+\expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi
+\expandafter\ifx\csname doiprefix\endcsname\relax\def\doiprefix{DOI }\fi
+\providecommand{\bibinfo}[2]{#2}
+\providecommand{\eprint}[2][]{\url{#2}}
+
+\bibitem{guyon2003introduction}
+\bibinfo{author}{Guyon, I.} \& \bibinfo{author}{Elisseeff, A.}
+\newblock \bibinfo{journal}{\bibinfo{title}{An introduction to variable and
+  feature selection}}.
+\newblock {\emph{\JournalTitle{Journal of Machine Learning Research}}}
+  \textbf{\bibinfo{volume}{3}}, \bibinfo{pages}{1157--1182}
+  (\bibinfo{year}{2003}).
+\newblock \urlprefix\url{https://www.jmlr.org/papers/v3/guyon03a.html}.
+
+\bibitem{saeys2007review}
+\bibinfo{author}{Saeys, Y.}, \bibinfo{author}{Inza, I.} \&
+  \bibinfo{author}{Larra{\~n}aga, P.}
+\newblock \bibinfo{journal}{\bibinfo{title}{A review of feature selection
+  techniques in bioinformatics}}.
+\newblock {\emph{\JournalTitle{Bioinformatics}}} \textbf{\bibinfo{volume}{23}},
+  \bibinfo{pages}{2507--2517} (\bibinfo{year}{2007}).
+\newblock \doiprefix 10.1093/bioinformatics/btm344.
+
+\bibitem{breiman2001random}
+\bibinfo{author}{Breiman, L.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Random forests}}.
+\newblock {\emph{\JournalTitle{Machine Learning}}}
+  \textbf{\bibinfo{volume}{45}}, \bibinfo{pages}{5--32} (\bibinfo{year}{2001}).
+\newblock \doiprefix 10.1023/A:1010933404324.
+
+\bibitem{brier1950verification}
+\bibinfo{author}{Brier, G.~W.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Verification of forecasts expressed
+  in terms of probability}}.
+\newblock {\emph{\JournalTitle{Monthly Weather Review}}}
+  \textbf{\bibinfo{volume}{78}}, \bibinfo{pages}{1--3} (\bibinfo{year}{1950}).
+\newblock \doiprefix 10.1175/1520-0493(1950)078<0001:VOFEIT>2.0.CO;2.
+
+\bibitem{niculescu2005predicting}
+\bibinfo{author}{Niculescu-Mizil, A.} \& \bibinfo{author}{Caruana, R.}
+\newblock \bibinfo{title}{Predicting good probabilities with supervised
+  learning}.
+\newblock In \emph{\bibinfo{booktitle}{Proceedings of the 22nd International
+  Conference on Machine Learning}}, \bibinfo{pages}{625--632}
+  (\bibinfo{publisher}{ACM}, \bibinfo{year}{2005}).
+\newblock \doiprefix 10.1145/1102351.1102430.
+
+\bibitem{guo2017calibration}
+\bibinfo{author}{Guo, C.}, \bibinfo{author}{Pleiss, G.}, \bibinfo{author}{Sun,
+  Y.} \& \bibinfo{author}{Weinberger, K.~Q.}
+\newblock \bibinfo{title}{On calibration of modern neural networks}.
+\newblock In \emph{\bibinfo{booktitle}{Proceedings of the 34th International
+  Conference on Machine Learning}}, \bibinfo{pages}{1321--1330}
+  (\bibinfo{publisher}{PMLR}, \bibinfo{year}{2017}).
+
+\bibitem{vancalster2019calibration}
+\bibinfo{author}{Van~Calster, B.}, \bibinfo{author}{McLernon, D.~J.},
+  \bibinfo{author}{van Smeden, M.}, \bibinfo{author}{Wynants, L.} \&
+  \bibinfo{author}{Steyerberg, E.~W.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Calibration: the {Achilles} heel of
+  predictive analytics}}.
+\newblock {\emph{\JournalTitle{BMC Medicine}}} \textbf{\bibinfo{volume}{17}},
+  \bibinfo{pages}{230} (\bibinfo{year}{2019}).
+\newblock \doiprefix 10.1186/s12916-019-1466-7.
+
+\bibitem{steyerberg2010assessing}
+\bibinfo{author}{Steyerberg, E.~W.} \emph{et~al.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Assessing the performance of
+  prediction models: a framework for traditional and novel measures}}.
+\newblock {\emph{\JournalTitle{Epidemiology}}} \textbf{\bibinfo{volume}{21}},
+  \bibinfo{pages}{128--138} (\bibinfo{year}{2010}).
+\newblock \doiprefix 10.1097/EDE.0b013e3181c30fb2.
+
+\bibitem{elyaniv2010foundations}
+\bibinfo{author}{El-Yaniv, R.} \& \bibinfo{author}{Wiener, Y.}
+\newblock \bibinfo{journal}{\bibinfo{title}{On the foundations of noise-free
+  selective classification}}.
+\newblock {\emph{\JournalTitle{Journal of Machine Learning Research}}}
+  \textbf{\bibinfo{volume}{11}}, \bibinfo{pages}{1605--1641}
+  (\bibinfo{year}{2010}).
+\newblock \urlprefix\url{https://www.jmlr.org/papers/v11/el-yaniv10a.html}.
+
+\bibitem{geifman2017selective}
+\bibinfo{author}{Geifman, Y.} \& \bibinfo{author}{El-Yaniv, R.}
+\newblock \bibinfo{title}{Selective classification for deep neural networks}.
+\newblock In \emph{\bibinfo{booktitle}{Advances in Neural Information
+  Processing Systems}}, vol.~\bibinfo{volume}{30} (\bibinfo{publisher}{Curran
+  Associates, Inc.}, \bibinfo{year}{2017}).
+
+\bibitem{obermeyer2019dissecting}
+\bibinfo{author}{Obermeyer, Z.}, \bibinfo{author}{Powers, B.},
+  \bibinfo{author}{Vogeli, C.} \& \bibinfo{author}{Mullainathan, S.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Dissecting racial bias in an
+  algorithm used to manage the health of populations}}.
+\newblock {\emph{\JournalTitle{Science}}} \textbf{\bibinfo{volume}{366}},
+  \bibinfo{pages}{447--453} (\bibinfo{year}{2019}).
+\newblock \doiprefix 10.1126/science.aax2342.
+
+\bibitem{rajkomar2018ensuring}
+\bibinfo{author}{Rajkomar, A.}, \bibinfo{author}{Hardt, M.},
+  \bibinfo{author}{Howell, M.~D.}, \bibinfo{author}{Corrado, G.} \&
+  \bibinfo{author}{Chin, M.~H.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Ensuring fairness in machine
+  learning to advance health equity}}.
+\newblock {\emph{\JournalTitle{Annals of Internal Medicine}}}
+  \textbf{\bibinfo{volume}{169}}, \bibinfo{pages}{866--872}
+  (\bibinfo{year}{2018}).
+\newblock \doiprefix 10.7326/M18-1990.
+
+\bibitem{collins2024tripod}
+\bibinfo{author}{Collins, G.~S.} \emph{et~al.}
+\newblock \bibinfo{journal}{\bibinfo{title}{{TRIPOD+AI} statement: updated
+  guidance for reporting clinical prediction models that use regression or
+  machine learning methods}}.
+\newblock {\emph{\JournalTitle{BMJ}}} \textbf{\bibinfo{volume}{385}},
+  \bibinfo{pages}{e078378} (\bibinfo{year}{2024}).
+\newblock \doiprefix 10.1136/bmj.q902.
+
+\bibitem{detrano1989international}
+\bibinfo{author}{Detrano, R.} \emph{et~al.}
+\newblock \bibinfo{journal}{\bibinfo{title}{International application of a new
+  probability algorithm for the diagnosis of coronary artery disease}}.
+\newblock {\emph{\JournalTitle{The American Journal of Cardiology}}}
+  \textbf{\bibinfo{volume}{64}}, \bibinfo{pages}{304--310}
+  (\bibinfo{year}{1989}).
+\newblock \doiprefix 10.1016/0002-9149(89)90524-9.
+
+\bibitem{street1993nuclear}
+\bibinfo{author}{Street, W.~N.}, \bibinfo{author}{Wolberg, W.~H.} \&
+  \bibinfo{author}{Mangasarian, O.~L.}
+\newblock \bibinfo{title}{Nuclear feature extraction for breast tumor
+  diagnosis}.
+\newblock In \emph{\bibinfo{booktitle}{Biomedical Image Processing and
+  Biomedical Visualization}}, vol. \bibinfo{volume}{1905},
+  \bibinfo{pages}{861--870} (\bibinfo{publisher}{SPIE}, \bibinfo{year}{1993}).
+\newblock \doiprefix 10.1117/12.148698.
+
+\bibitem{smith1988using}
+\bibinfo{author}{Smith, J.~W.}, \bibinfo{author}{Everhart, J.~E.},
+  \bibinfo{author}{Dickson, W.~C.}, \bibinfo{author}{Knowler, W.~C.} \&
+  \bibinfo{author}{Johannes, R.~S.}
+\newblock \bibinfo{title}{Using the {ADAP} learning algorithm to forecast the
+  onset of diabetes mellitus}.
+\newblock In \emph{\bibinfo{booktitle}{Proceedings of the Annual Symposium on
+  Computer Application in Medical Care}}, \bibinfo{pages}{261--265}
+  (\bibinfo{publisher}{IEEE Computer Society Press}, \bibinfo{year}{1988}).
+
+\bibitem{chicco2020machine}
+\bibinfo{author}{Chicco, D.} \& \bibinfo{author}{Jurman, G.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Machine learning can predict
+  survival of patients with heart failure from serum creatinine and ejection
+  fraction alone}}.
+\newblock {\emph{\JournalTitle{BMC Medical Informatics and Decision Making}}}
+  \textbf{\bibinfo{volume}{20}}, \bibinfo{pages}{16} (\bibinfo{year}{2020}).
+\newblock \doiprefix 10.1186/s12911-020-1023-5.
+
+\bibitem{vickers2006decision}
+\bibinfo{author}{Vickers, A.~J.} \& \bibinfo{author}{Elkin, E.~B.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Decision curve analysis: a novel
+  method for evaluating prediction models}}.
+\newblock {\emph{\JournalTitle{Medical Decision Making}}}
+  \textbf{\bibinfo{volume}{26}}, \bibinfo{pages}{565--574}
+  (\bibinfo{year}{2006}).
+\newblock \doiprefix 10.1177/0272989X06295361.
+
+\bibitem{romano2020classification}
+\bibinfo{author}{Romano, Y.}, \bibinfo{author}{Sesia, M.} \&
+  \bibinfo{author}{Cand{\`e}s, E.}
+\newblock \bibinfo{title}{Classification with valid and adaptive coverage}.
+\newblock In \emph{\bibinfo{booktitle}{Advances in Neural Information
+  Processing Systems}}, vol.~\bibinfo{volume}{33} (\bibinfo{publisher}{Curran
+  Associates, Inc.}, \bibinfo{year}{2020}).
+
+\bibitem{angelopoulos2023conformal}
+\bibinfo{author}{Angelopoulos, A.~N.} \& \bibinfo{author}{Bates, S.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Conformal prediction: A gentle
+  introduction}}.
+\newblock {\emph{\JournalTitle{Foundations and Trends in Machine Learning}}}
+  \textbf{\bibinfo{volume}{16}}, \bibinfo{pages}{494--591}
+  (\bibinfo{year}{2023}).
+\newblock \doiprefix 10.1561/9781638281597.
+
+\bibitem{holm1979simple}
+\bibinfo{author}{Holm, S.}
+\newblock \bibinfo{journal}{\bibinfo{title}{A simple sequentially rejective
+  multiple test procedure}}.
+\newblock {\emph{\JournalTitle{Scandinavian Journal of Statistics}}}
+  \textbf{\bibinfo{volume}{6}}, \bibinfo{pages}{65--70} (\bibinfo{year}{1979}).
+\newblock \urlprefix\url{https://www.jstor.org/stable/4615733}.
+
+\bibitem{pfohl2022net}
+\bibinfo{author}{Pfohl, S.~R.} \emph{et~al.}
+\newblock \bibinfo{title}{Net benefit, calibration, threshold selection, and
+  training objectives for algorithmic fairness in healthcare}.
+\newblock In \emph{\bibinfo{booktitle}{Proceedings of the 2022 ACM Conference
+  on Fairness, Accountability, and Transparency}}, \bibinfo{pages}{1039--1052}
+  (\bibinfo{publisher}{ACM}, \bibinfo{year}{2022}).
+\newblock \doiprefix 10.1145/3531146.3533166.
+
+\end{thebibliography}
+
+\end{document}

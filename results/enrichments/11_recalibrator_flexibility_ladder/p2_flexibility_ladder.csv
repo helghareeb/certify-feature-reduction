@@ -1,0 +1,6 @@
+calibrate,flexibility,ece,ece_recovery,aurc,aurc_recovery,net_benefit_recovery,cells
+none,0,0.0694,0.0,0.084,0.0,0.0,108
+temperature,1,0.064,0.0054,0.0814,0.0026,0.0001,108
+sigmoid,2,0.0542,0.0152,0.0844,-0.0004,0.0021,108
+beta,3,0.0504,0.0191,0.0845,-0.0005,0.0024,108
+isotonic,99,0.0501,0.0193,0.0853,-0.0013,0.0028,108

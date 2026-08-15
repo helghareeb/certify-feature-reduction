@@ -1,0 +1,84 @@
+{
+  "worked_example": {
+    "dataset": "mammographic",
+    "threshold": 0.1,
+    "n_patients": 961,
+    "n_flip_majority": 203,
+    "n_flip_ever": 257,
+    "n_flip_majority_y1": 15,
+    "n_missed_treatment": 4,
+    "sensitivity": {
+      "0.05": {
+        "n_flip_majority": 92,
+        "n_flip_majority_y1": 7
+      },
+      "0.15": {
+        "n_flip_majority": 266,
+        "n_flip_majority_y1": 19
+      }
+    },
+    "flip_rate_deciles": {
+      "0.5": 0.0,
+      "0.9": 1.0,
+      "0.95": 1.0,
+      "0.99": 1.0
+    }
+  },
+  "secondary_example": {
+    "dataset": "diabetes130",
+    "threshold": 0.1,
+    "n_patients": 101763,
+    "n_flip_majority": 14324,
+    "n_flip_ever": 38301,
+    "n_flip_majority_y1": 1532,
+    "n_missed_treatment": 1132,
+    "sensitivity": {
+      "0.05": {
+        "n_flip_majority": 95,
+        "n_flip_majority_y1": 5
+      },
+      "0.15": {
+        "n_flip_majority": 4559,
+        "n_flip_majority_y1": 734
+      }
+    },
+    "flip_rate_deciles": {
+      "0.5": 0.0,
+      "0.9": 0.8333,
+      "0.95": 0.9333,
+      "0.99": 1.0
+    }
+  },
+  "flips_by_race": {
+    "Caucasian": {
+      "n": 76099,
+      "mean_flip_rate": 0.1493,
+      "pct_flip_majority": 0.1443
+    },
+    "Unknown": {
+      "n": 2271,
+      "mean_flip_rate": 0.1441,
+      "pct_flip_majority": 0.1387
+    },
+    "Other": {
+      "n": 1505,
+      "mean_flip_rate": 0.1375,
+      "pct_flip_majority": 0.1282
+    },
+    "AfricanAmerican": {
+      "n": 19210,
+      "mean_flip_rate": 0.1368,
+      "pct_flip_majority": 0.1324
+    },
+    "Asian": {
+      "n": 641,
+      "mean_flip_rate": 0.119,
+      "pct_flip_majority": 0.117
+    },
+    "Hispanic": {
+      "n": 2037,
+      "mean_flip_rate": 0.1122,
+      "pct_flip_majority": 0.1051
+    }
+  }
+}

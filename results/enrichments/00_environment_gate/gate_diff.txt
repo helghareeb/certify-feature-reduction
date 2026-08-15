@@ -1,0 +1,18 @@
+cleveland frac-arm cells — repro=540 committed=540 matched=540
+
+value comparisons: 5292, byte-identical strings: 5292
+max |diff| per column:
+  mean           0.000e+00   
+  ci_lo          0.000e+00   
+  ci_hi          0.000e+00   
+  delta          0.000e+00   
+  cohens_d       0.000e+00   
+  diff_ci_lo     0.000e+00   
+  diff_ci_hi     0.000e+00   
+  p_raw          0.000e+00   
+  p_holm         0.000e+00   
+  k_features     0.000e+00   
+  n_features     0.000e+00   
+
+OVERALL max |diff| across all cells/columns = 0.000e+00
+VERDICT: BYTE-IDENTICAL — proceed to Tier 1

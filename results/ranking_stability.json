@@ -1,0 +1,294 @@
+{
+  "cleveland": {
+    "p": 12,
+    "k_aggressive": 3,
+    "per_method": {
+      "mutual_info": {
+        "jaccard_k3": 0.5627,
+        "jaccard_k4": 0.5964,
+        "aurc_harm": 0.0487
+      },
+      "rf_importance": {
+        "jaccard_k3": 0.4888,
+        "jaccard_k4": 0.676,
+        "aurc_harm": 0.0741
+      },
+      "l1_logistic": {
+        "jaccard_k3": 0.676,
+        "jaccard_k4": 0.6675,
+        "aurc_harm": 0.0408
+      }
+    },
+    "mean_jaccard_aggressive": 0.5758,
+    "aurc_harm": 0.0545
+  },
+  "pima": {
+    "p": 8,
+    "k_aggressive": 2,
+    "per_method": {
+      "mutual_info": {
+        "jaccard_k2": 0.8048,
+        "jaccard_k4": 0.7339,
+        "aurc_harm": 0.0311
+      },
+      "rf_importance": {
+        "jaccard_k2": 0.9911,
+        "jaccard_k4": 1.0,
+        "aurc_harm": 0.0284
+      },
+      "l1_logistic": {
+        "jaccard_k2": 0.9911,
+        "jaccard_k4": 0.9407,
+        "aurc_harm": 0.0277
+      }
+    },
+    "mean_jaccard_aggressive": 0.929,
+    "aurc_harm": 0.0291
+  },
+  "ilpd": {
+    "p": 9,
+    "k_aggressive": 2,
+    "per_method": {
+      "mutual_info": {
+        "jaccard_k2": 0.3495,
+        "jaccard_k4": 0.5997,
+        "aurc_harm": 0.0375
+      },
+      "rf_importance": {
+        "jaccard_k2": 0.4984,
+        "jaccard_k4": 0.9738,
+        "aurc_harm": 0.0507
+      },
+      "l1_logistic": {
+        "jaccard_k2": 0.9318,
+        "jaccard_k4": 0.631,
+        "aurc_harm": 0.0233
+      }
+    },
+    "mean_jaccard_aggressive": 0.5932,
+    "aurc_harm": 0.0372
+  },
+  "heartfailure": {
+    "p": 11,
+    "k_aggressive": 3,
+    "per_method": {
+      "mutual_info": {
+        "jaccard_k3": 0.6926,
+        "jaccard_k4": 0.7491,
+        "aurc_harm": 0.0135
+      },
+      "rf_importance": {
+        "jaccard_k3": 0.9429,
+        "jaccard_k4": 0.7735,
+        "aurc_harm": 0.0035
+      },
+      "l1_logistic": {
+        "jaccard_k3": 0.8571,
+        "jaccard_k4": 0.949,
+        "aurc_harm": 0.0072
+      }
+    },
+    "mean_jaccard_aggressive": 0.8309,
+    "aurc_harm": 0.0081
+  },
+  "wdbc": {
+    "p": 30,
+    "k_aggressive": 8,
+    "per_method": {
+      "mutual_info": {
+        "jaccard_k8": 0.8183,
+        "jaccard_k4": 0.7606,
+        "aurc_harm": 0.0046
+      },
+      "rf_importance": {
+        "jaccard_k8": 0.7201,
+        "jaccard_k4": 0.7068,
+        "aurc_harm": 0.0039
+      },
+      "l1_logistic": {
+        "jaccard_k8": 0.6798,
+        "jaccard_k4": 0.5746,
+        "aurc_harm": 0.0001
+      }
+    },
+    "mean_jaccard_aggressive": 0.7394,
+    "aurc_harm": 0.0029
+  },
+  "statlogheart": {
+    "p": 12,
+    "k_aggressive": 3,
+    "per_method": {
+      "mutual_info": {
+        "jaccard_k3": 0.5165,
+        "jaccard_k4": 0.5801,
+        "aurc_harm": 0.0623
+      },
+      "rf_importance": {
+        "jaccard_k3": 0.4759,
+        "jaccard_k4": 0.6721,
+        "aurc_harm": 0.0863
+      },
+      "l1_logistic": {
+        "jaccard_k3": 0.7115,
+        "jaccard_k4": 0.7534,
+        "aurc_harm": 0.0561
+      }
+    },
+    "mean_jaccard_aggressive": 0.568,
+    "aurc_harm": 0.0682
+  },
+  "haberman": {
+    "p": 3,
+    "k_aggressive": 1,
+    "per_method": {
+      "mutual_info": {
+        "jaccard_k1": 0.8047,
+        "jaccard_k4": 0.6439,
+        "aurc_harm": 0.0512
+      },
+      "rf_importance": {
+        "jaccard_k1": 0.9867,
+        "jaccard_k4": 1.0,
+        "aurc_harm": 0.0764
+      },
+      "l1_logistic": {
+        "jaccard_k1": 1.0,
+        "jaccard_k4": 0.9823,
+        "aurc_harm": 0.0529
+      }
+    },
+    "mean_jaccard_aggressive": 0.9305,
+    "aurc_harm": 0.0602
+  },
+  "hepatitis": {
+    "p": 18,
+    "k_aggressive": 4,
+    "per_method": {
+      "mutual_info": {
+        "jaccard_k4": 0.3689,
+        "aurc_harm": 0.0129
+      },
+      "rf_importance": {
+        "jaccard_k4": 0.6922,
+        "aurc_harm": 0.0112
+      },
+      "l1_logistic": {
+        "jaccard_k4": 0.3964,
+        "aurc_harm": 0.0347
+      }
+    },
+    "mean_jaccard_aggressive": 0.4858,
+    "aurc_harm": 0.0196
+  },
+  "mammographic": {
+    "p": 5,
+    "k_aggressive": 1,
+    "per_method": {
+      "mutual_info": {
+        "jaccard_k1": 0.9605,
+        "jaccard_k4": 1.0,
+        "aurc_harm": 0.0571
+      },
+      "rf_importance": {
+        "jaccard_k1": 0.5361,
+        "jaccard_k4": 1.0,
+        "aurc_harm": 0.0961
+      },
+      "l1_logistic": {
+        "jaccard_k1": 1.0,
+        "jaccard_k4": 1.0,
+        "aurc_harm": 0.0573
+      }
+    },
+    "mean_jaccard_aggressive": 0.8322,
+    "aurc_harm": 0.0702
+  },
+  "bcw": {
+    "p": 9,
+    "k_aggressive": 2,
+    "per_method": {
+      "mutual_info": {
+        "jaccard_k2": 1.0,
+        "jaccard_k4": 0.9354,
+        "aurc_harm": 0.0269
+      },
+      "rf_importance": {
+        "jaccard_k2": 0.6711,
+        "jaccard_k4": 0.845,
+        "aurc_harm": 0.0207
+      },
+      "l1_logistic": {
+        "jaccard_k2": 0.8399,
+        "jaccard_k4": 0.7605,
+        "aurc_harm": 0.0153
+      }
+    },
+    "mean_jaccard_aggressive": 0.837,
+    "aurc_harm": 0.021
+  },
+  "spectf": {
+    "p": 44,
+    "k_aggressive": 11,
+    "per_method": {
+      "mutual_info": {
+        "jaccard_k11": 0.4406,
+        "jaccard_k4": 0.3117,
+        "aurc_harm": 0.003
+      },
+      "rf_importance": {
+        "jaccard_k11": 0.5752,
+        "jaccard_k4": 0.4282,
+        "aurc_harm": 0.0018
+      },
+      "l1_logistic": {
+        "jaccard_k11": 0.4991,
+        "jaccard_k4": 0.4625,
+        "aurc_harm": 0.0008
+      }
+    },
+    "mean_jaccard_aggressive": 0.505,
+    "aurc_harm": 0.0019
+  },
+  "diabetes130": {
+    "p": 16,
+    "k_aggressive": 4,
+    "per_method": {
+      "mutual_info": {
+        "jaccard_k4": 0.8932,
+        "aurc_harm": 0.0
+      },
+      "rf_importance": {
+        "jaccard_k4": 1.0,
+        "aurc_harm": 0.0255
+      },
+      "l1_logistic": {
+        "jaccard_k4": 0.9499,
+        "aurc_harm": -0.0011
+      }
+    },
+    "mean_jaccard_aggressive": 0.9477,
+    "aurc_harm": 0.0081
+  },
+  "_correlation": {
+    "spearman_stability_vs_harm": 0.14,
+    "p": 0.6646,
+    "n": 12
+  },
+  "_correlation_by_ranker": {
+    "pooled": {
+      "spearman_stability_vs_harm": -0.047,
+      "p": 0.786,
+      "n": 36
+    },
+    "within_dataset": {
+      "spearman_stability_vs_harm": -0.292,
+      "p_parametric_ANTICONSERVATIVE": 0.0843,
+      "p_block_permutation_two_sided": 0.1854,
+      "p_block_permutation_one_sided": 0.0909,
+      "n_pairs": 36,
+      "n_blocks": 12,
+      "n_permutations": 20000
+    },
+    "note": "Negative rho is the direction the selection-noise hypothesis PREDICTS (less stable -> more harm). The within-dataset trend is therefore not evidence against that hypothesis; it is a weak, non-significant trend toward it, and it is confounded with ranker quality. Section 4.7 rests the claim on the exact-k arm and on the most-harmed datasets being among the most stable, not on this correlation."
+  }
+}

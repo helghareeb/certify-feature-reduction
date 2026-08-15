@@ -1,0 +1,237 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\definecolor{revblue}{RGB}{20,60,140}
+\newcommand{\point}[1]{\par\medskip\noindent\textbf{\color{revblue}#1}\par\smallskip}
+\newcommand{\reply}{\par\noindent\textbf{Response.}\ }
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\begin{document}
+
+\begin{center}
+{\large\textbf{Response to the reviewers}}\\[2pt]
+Aggressive feature reduction degrades the selective reliability and clinical net benefit of
+clinical risk models\\[2pt]
+Scientific Reports submission 2650209c-ff1e-4df4-aeb0-75ef3b35e564 (revised manuscript)
+\end{center}
+
+Greetings, and thank you --- both reviews improved this paper materially, and Reviewer~1's first
+point changed one of its conclusions. Rather than patch the affected analyses, we re-ran the entire
+experimental grid from scratch under a new, fully hash-pinned configuration, extended it with an
+exact-$k$ budget arm and the full Diabetes-130 cohort, and re-derived every number in the manuscript
+from the regenerated results. The rebuild reproduces the originally submitted aggregates on the
+eleven unchanged datasets at machine precision for the tree-based learners
+($\le1.2\times10^{-16}$ on any estimate or interval bound) and within $1\times10^{-4}$ for logistic
+regression (largest observed deviation $5.1\times10^{-5}$; a documented solver-version sensitivity,
+and the environment is now version-locked). The Holm-corrected $p$-values move correspondingly more
+on those logistic cells (at most $3.9\times10^{-3}$), and every one of the 5{,}265 materiality
+verdicts is nonetheless identical --- so all changes below are attributable to the revision's
+additions, not to instability of the pipeline.
+
+\section*{Reviewer 1}
+
+\point{1. The rounding rule retains at least one feature no matter how aggressive the cut\ldots\
+feature count and absolute retained-$k$ are mechanically linked through this rule, so the
+correlation may substantially reflect the simpler point that ``reducing to one feature is unsafe.''
+I ask the authors to re-relate the harm to the absolute number of retained features (or compare
+datasets at matched retained-$k$).}
+
+\reply You were right, and we did both --- and the matched-$k$ experiment overturned our original
+reading. First, the reanalysis you asked for: harm correlates with the absolute retained count
+\emph{more strongly} than with the feature count (Spearman $\rho=-0.78$ vs.\ $-0.71$; both
+leave-one-dataset-out robust with bootstrap intervals excluding zero), and excluding the two
+floor-collapsed datasets attenuates the $p$-association to non-significance ($\rho=-0.59$,
+$p=0.075$, $n=10$). Second,
+the decisive experiment: we added an \emph{exact-$k$ budget arm} ($k\in\{1,2,4,8\}$ for every
+dataset, evaluated inside the same repetitions and folds as the fractional budgets, in its own Holm
+family so the original comparisons are untouched). At matched $k=1$, \emph{every} dataset is
+materially harmed --- including the wide ones: SPECTF ($p=44$), whose own 25\,\% budget costs
+$+0.002$ AURC, pays $+0.035$ at $k=1$; WDBC $+0.030$; the full readmission cohort $+0.027$; Statlog
+and Cleveland pay $+0.19$ and $+0.18$. The claim you challenged (``datasets with more candidate
+features are reliably safer to reduce'') is therefore \emph{retired} in the revision: the apparent
+robustness of wide datasets is a property of the retained count their fractional budgets never
+leave, dataset structure modulates severity at matched $k$ by an order of magnitude, and the harm is
+not attributable to instability of the selection itself. On that last point we report a dissociation
+rather than lean on a correlation: Haberman is the second most stable dataset in the study and the
+third most harmed, while SPECTF is among the least stable and the least harmed. The correlational
+test is given in both directions and as measured --- null across datasets ($\rho=+0.14$, $p=0.66$),
+and at the finer (dataset, ranker) level null when pooled ($\rho=-0.047$, $n=36$) but with a weak
+within-dataset trend ($\rho=-0.29$, $p=0.19$ by block permutation) whose sign is the one a
+noise mechanism would predict. We state plainly that this trend is non-significant, that it is
+confounded with ranker quality, and that we do not rest the claim on it; the exact-$k$ arm carries
+it instead, since at $k=1$ even datasets with near-deterministic selections are materially harmed.
+Section~4.7 is rewritten around this result, the
+budget rule's floor and rounding behaviour are now stated explicitly in Methods with their
+consequences, and a new table shows that a strict safety certificate (no materially-worse cell on
+any axis) passes for exactly one dataset at one budget in this study --- the audit, not any proxy,
+is the certificate.
+
+\point{2. I would like more discussion of the precedent for applying feature reduction to
+lower-dimensional medical datasets, and an explicit statement that the guidance does not extend to
+the high-dimensional regime.}
+
+\reply Both added. Related work now documents the precedent --- most directly, the published
+survival study on the very heart-failure cohort we reuse argued that two of its twelve features
+suffice, on discrimination-style evidence alone; the Cleveland and Pima datasets were likewise
+introduced with compact selected-subset models. The Limitations section now carries an explicit,
+bolded scope statement: the guidance does not extend to the high-dimensional regime ($p\gg44$;
+genomic, transcriptomic, radiomic, or wide-EHR feature spaces), where selection is a statistical
+necessity and retained budgets remain far above the single-digit counts at which we observe the
+largest harm.
+
+\point{3. I would like at least one worked example showing where reduction would have flipped a real
+treatment decision for a patient, at a specific clinically relevant threshold.}
+
+\reply Added as a new results section, with the cell and threshold fixed \emph{a priori} in a
+committed analysis configuration before any flip was counted. On the mammographic-mass data at the
+conventional 10\,\% biopsy threshold, reducing to the 25\,\% budget --- which on this dataset is a
+single feature --- flips the biopsy decision for 203 of 961 patients (21\,\%) in the majority of the
+30 paired models, including 4 patients with malignant masses moved \emph{from biopsy to no biopsy};
+a table of exemplar patients with their feature values and per-threshold decision curves is
+included, along with sensitivity at $t=0.05$ and $0.15$. At population scale, the same analysis on
+the full readmission cohort flips the enrollment decision for 14{,}324 of 101{,}763 encounters
+(14.1\,\%), including 1{,}132 true readmissions that lose the intervention. Reliability diagrams
+show the mechanism (the reduced model's probabilities compress toward the prevalence), and the
+per-patient prediction caches behind these counts are committed, so every number regenerates
+without re-running any experiment.
+
+\point{4. I would like the full Diabetes-130 cohort analyzed, at least for the headline analysis.}
+
+\reply Done, beyond the request: the \emph{entire} grid --- all rankers, learners, budgets,
+repetitions, and the recalibration control --- now runs on all 101{,}763 eligible encounters, and
+every number in the manuscript rests on the full cohort. We also kept the subsample as a robustness
+arm and report the agreement explicitly (new Section~4.9): point estimates agree in the typical
+case (median absolute difference 0.004), but 20 of 45 materiality verdicts disagree --- in 12 the
+full cohort resolves an effect the subsample was underpowered to see, in 8 the subsample asserted
+materiality the full cohort refutes, and in 18 of the 45 the subsample reversed the \emph{sign} of
+the effect, most consequentially on discrimination ($+0.028$ full versus $-0.028$ subsampled). Your concern was substantively correct, and the manuscript now documents what the
+subsample would have missed.
+
+\point{5. As reproducibility is a central claim of the paper, I ask that the code repository be made
+available for reviewer inspection.}
+
+\reply The repository is public as of this resubmission --- not on request, and not deferred to
+acceptance: \texttt{github.com/helghareeb/certify-feature-reduction} (MIT license). It contains the complete
+code, the hash-pinned configurations (the originally submitted configuration and aggregates are
+preserved frozen under \texttt{submitted-v1/}), a script that downloads and SHA-256-verifies every
+raw dataset, the per-configuration summaries and per-patient caches, the pre-registration with a
+dated addendum disclosing every post-registration addition, and a cold-start reproduction guide.
+Every number in the revised manuscript regenerates from committed code, the configuration, and a
+recorded seed.
+
+\section*{Reviewer 2}
+
+Thank you for the close read --- we applied essentially all of the suggested wording changes, and
+they made the paper clearer. Specifics worth noting: the overloaded $k$ is resolved by spelling out
+five-fold cross-validation and reserving $k$ exclusively for the number of retained features (which
+the revision made load-bearing); the monotonicity claim is now scoped to the mean trajectory and
+names the panels, acknowledging that the per-dataset ECE curves (left panel) are not monotone;
+Table~3 is deleted and its content folded into one sentence, as suggested; ``a wash on average'' and
+``fairness axes agree'' are rewritten in plain terms; ``compact'' and ``wide'' are now formally
+defined at first use ($p\le12$ vs.\ $p\ge16$) and marked in the meta-analysis figure; ``Relation to
+prior work'' is retitled ``Relation to established practice''; ``co-move'' $\to$ ``move in
+tandem''; ``shuffling'' $\to$ ``permuting''; and the Section-1 and Section-3 line edits are applied
+as proposed. One deliberate exception: we kept \emph{abstain} (rather than \emph{discard}) because
+it is the standard term in the selective-prediction literature, and instead added a defining clause
+at first use (``abstain --- decline to issue a prediction'').
+
+\section*{Beyond the requested changes}
+
+Because the reviews prompted a full rebuild, we took the opportunity to strengthen the paper
+further: a strict per-dataset safety-certificate table (Section~4.7); leave-one-dataset-out and
+bootstrap robustness for the cross-dataset correlations; the population-scale flip-rate
+distribution and its race-group breakdown on the full cohort (decision instability is \emph{not}
+concentrated on minority groups in this cohort --- reported as measured); reliability diagrams for
+the worked-example cell; a selection-stability analysis whose null result rules out ranking noise
+as the mechanism of harm; a boxed six-step practitioner checklist; and the enforcement, in code,
+of the hash-gate the manuscript describes (analysis now refuses to combine results from mismatched
+configurations). A dated addendum to the deposited pre-registration discloses every
+post-registration addition explicitly.
+
+\section*{A second round of strengthening, and three claims we withdrew}
+
+After preparing the response above we continued the audit rather than stopping at the reviewers'
+requests, and the additional work changed the paper in ways we want to state plainly --- including
+where it went against us.
+
+\subsection*{The concession Reviewer~1's line of questioning implied, now measured}
+
+The submitted Limitations conceded that AURC is computed from a confidence, $|p-0.5|$, that is
+itself a function of the predicted probability, and that establishing selective reliability as
+\emph{independent} evidence ``would require a confidence estimated outside the predicted probability
+altogether --- which we did not run.'' We have now run it. For every out-of-fold point we computed
+the mean Euclidean distance to its ten nearest neighbours in the full feature space, standardised on
+training-fold statistics only, and used that as the confidence; the model's predicted probability
+never enters it.
+
+The result corrects our own headline, and we report it in the Abstract and the Discussion rather
+than in a limitation. The mean AURC reduction penalty falls from $+0.0334$ under the
+probability-scale confidence to $+0.0116$ under the probability-independent one: \textbf{roughly
+two-thirds of the measured selective-reliability harm was a property of the probability scale.} The
+remaining third survives, decisively ($p=7\times10^{-103}$ over 2{,}160 cells) and with no
+dependence on cohort size, which is what makes it evidence of a genuine loss of error-ordering
+rather than a restatement of the calibration result. We also tested the obvious model-based
+alternative first and report that it fails structurally: per-tree disagreement correlates with
+$|p-0.5|$ at $\rho=-0.991$, because a forest disagrees most where its mean prediction sits near the
+decision boundary.
+
+\subsection*{``You did not try a flexible enough recalibrator''}
+
+The submitted version rested the claim that recalibration cannot recover selective reliability on
+isotonic regression alone. We added temperature scaling and beta calibration under the same
+leakage-safe inner-cross-validation protocol and ordered all five recalibrators by flexibility on one
+matched grid. Calibration-error recovery rises \emph{strictly monotonically} with flexibility, from
+$+0.0054$ at one parameter to $+0.0193$ for the nonparametric recalibrator (Spearman $+1.00$),
+reaching $27.8\,\%$ of the uncalibrated baseline; selective-reliability recovery does not follow, and
+its correlation with flexibility runs the opposite way ($-0.90$), with the largest movement worth
+$3.1\,\%$ of baseline. The failure to recover is therefore not a limitation of the recalibrator.
+Net-benefit recovery does rise monotonically, and we report that rather than describe it as flat ---
+its magnitude, $0.9\,\%$ of baseline, is what makes it negligible, not its direction.
+
+\subsection*{A causal test of the mechanism, whose pre-registered prediction failed}
+
+Both reviewers' concerns turn on \emph{when} reduction is safe, so we tested our proposed explanation
+causally instead of correlationally, and pre-registered the prediction before computing. If diffuse
+signal is what makes reduction harmful, then padding a dataset with pure-noise features --- holding
+rows, true features, folds and the \emph{absolute} budget fixed --- should increase the harm.
+
+It did not. Dilution lowered the penalty (cleveland, $+0.054\to+0.006$ at ten-fold padding),
+reversed its sign (SPECTF, $+0.004\to-0.037$), or left it unmoved (mammographic,
+$+0.086\to+0.081$). \textbf{Reduction defends against noise padding}, because the ranker keeps
+recovering the true features while the full model degrades. We report the refutation as measured. It
+also sharpens the account: what distinguishes a harmed dataset is not how much noise it contains but
+how many features carry its signal, an effective dimensionality that no single concentration index
+captures across widths differing by two orders of magnitude.
+
+\subsection*{Three claims withdrawn, and why we are telling you}
+
+A pre-submission audit of the manuscript against its own released results found three statements we
+could not defend, and we removed them rather than qualify them.
+
+\begin{enumerate}[leftmargin=1.4em,itemsep=2pt]
+\item An exploratory claim that the four high-dimensional datasets are \emph{ordered} from least to
+      most harmed by signal concentration. Tested across three rankers and three concentration
+      statistics it held in two of nine cases, and in \emph{none} of twenty-one once we corrected the
+      statistic for the width incomparability that caused the failure. A concentration column in our
+      own released results refuted it. Only the prostate-versus-arcene contrast, which is robust
+      across every ranker, budget and statistic, is retained.
+\item A sentence in the Discussion recommending that budget decisions be ``guided by the
+      feature-count / intrinsic-dimension screen above.'' That screen is precisely what this revision
+      withdrew in response to Reviewer~1; the sentence was stale text pointing readers at a criterion
+      the same manuscript retracts two sections earlier.
+\item The description of net-benefit recovery as flat, corrected above.
+\end{enumerate}
+
+We mention these because the alternative --- leaving them in, since no reviewer had asked --- is the
+failure mode this protocol exists to prevent. Every number in the manuscript is regenerated from a
+committed configuration and a recorded seed, every result file's calibration hash resolves to a
+configuration shipped in the repository, and every column in every released results file is either
+cited in the paper or declared out of scope with a stated reason.
+
+
+We believe the revised manuscript is substantially stronger than the original, in large part
+because of these reviews, and we hope it now meets the bar for acceptance.
+
+\end{document}

@@ -1,0 +1,51 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.ipynb_checkpoints/
+
+# --- OS / editor cruft ---
+.DS_Store
+
+# --- Logs & transient output ---
+*.log
+logs/
+*.out
+
+# --- LaTeX build litter ---
+# The bibliography is INLINED in main.tex (thebibliography), so no .bbl/.blg is
+# load-bearing; the SR revision package ships source + separate figure PDFs only.
+# main.pdf stays tracked deliberately: it is the reading copy, not a build input.
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.spl
+paper/*.toc
+paper/*.fls
+paper/*.fdb_latexmk
+paper/*.synctex.gz
+# NOTE: paper/submission/ and paper/submission_revision/ stay TRACKED -- they are the
+# record of exactly what was (and will be) uploaded, not build litter.
+
+# --- Lean-repo: large generated data & raw results ---
+# Policy: never commit large generated data or raw per-trial results.
+# Commit the generators/loaders and the canonical summary CSVs only;
+# reproducibility is preserved via download links in Data Availability.
+data/**/raw/
+datasets/
+results/raw/
+*.parquet
+*.npz
+*.h5
+*.ckpt
+*.pt
+*.zip
+
+# --- Keep canonical summary CSVs ---
+# Un-ignore the single canonical aggregator output(s) so they ARE versioned,
+# even though raw results above are not. These are the small, paper-grade
+# tables every figure/number derives from (R2).
+!results/*summary*.csv

@@ -1,0 +1,7 @@
+config/*.json -text
+results/*.csv -text
+results/**/*.csv -text
+results/**/MANIFEST*.sha256 -text
+results/**/*.md -text
+results/**/*.json -text
+results/**/*.py -text

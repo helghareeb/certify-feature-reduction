@@ -1,0 +1,70 @@
+Haitham A. El-Ghareeb
+Information Systems Department
+Faculty of Computers and Information Sciences
+Mansoura University, Mansoura, Egypt
+helghareeb@mans.edu.eg
+
+15 August 2026
+
+The Editors
+Scientific Reports
+
+Greetings,
+
+I am submitting the revised version of manuscript 2650209c-ff1e-4df4-aeb0-75ef3b35e564,
+"Aggressive feature reduction degrades the selective reliability and clinical net benefit of
+clinical risk models," for further consideration as an Article in Scientific Reports. A
+point-by-point response to both reviewers accompanies this letter.
+
+What the paper reports. Feature reduction is a near-universal preprocessing step in clinical
+risk modelling and is conventionally justified by showing that discrimination (AUROC)
+changes little. This study asks whether that justification is sufficient. It introduces a
+pre-registered, leakage-safe protocol certifying a reduced model on the properties a
+deployed risk score is actually relied upon for - probability calibration, selective (risk-
+coverage) reliability, clinical net benefit, distribution-free conformal informativeness,
+and between-subgroup equity - as a function of the retained-feature budget. Across twelve
+public clinical datasets, three learners and three feature-ranking methods (108
+configurations, 30 repetitions each), aggressive reduction degrades selective reliability,
+clinical net benefit and conformal informativeness at least as much as discrimination, and
+in a subset of settings with no discrimination warning at all, while probability calibration
+is mixed. At a matched budget of a single retained feature every dataset is materially
+harmed, and on the mammographic-mass cohort reduction flips the biopsy decision for one
+patient in five at a clinically conventional threshold.
+
+What changed in revision, including where the revision went against us. Reviewer 1
+identified that our screening criterion was confounded by the budget-rounding rule. Rather
+than patch the affected analyses I re-ran the entire experimental grid under a new hash-
+pinned configuration, added an exact-k budget arm and the full 101,763-encounter readmission
+cohort, and re-derived every number in the manuscript. The screening criterion did not
+survive: the revised paper states that no dataset property measured here certifies a budget
+in advance, and that the audit itself is the certificate. I also withdrew, before
+submission, an exploratory claim that signal concentration orders the harm across high-
+dimensional datasets - it failed when tested across all rankers and statistics - and I
+report a pre-registered causal prediction of my own that the data refuted. The response
+letter details all three.
+
+The revision also strengthens the central claim rather than only defending it. A
+probability-independent confidence, computed from feature-space distance, shows that roughly
+two-thirds of the measured selective-reliability harm reflects the probability scale while a
+third persists; and a five-recalibrator flexibility ladder establishes that the failure of
+post-hoc recalibration to recover selective reliability is not a limitation of the
+recalibrator.
+
+Fit and reproducibility. The work is methodologically rigorous and fully reproducible: every
+reported number regenerates from committed code, a hash-pinned calibration configuration and
+recorded random seeds, and the repository is made public on the day of this resubmission, as
+Reviewer 1 requested. The study uses only publicly available, de-identified datasets and
+adheres to the TRIPOD+AI reporting guideline. Its question is of broad, practical relevance
+to machine learning, clinical informatics and the responsible deployment of predictive
+models.
+
+This manuscript is original, has not been published previously and is not under
+consideration elsewhere. It has a single author, who has approved this submission, declares
+no competing interests, and has had no prior discussions with a Scientific Reports Editorial
+Board Member about this work. Supplementary Information accompanies the submission.
+
+Thank you for considering the revised manuscript.
+
+Sincerely,
+
+Haitham A. El-Ghareeb

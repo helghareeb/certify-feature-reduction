@@ -1,0 +1,51 @@
+{
+  "status": "validated",
+  "reps": 30,
+  "n_features": 12,
+  "most_aggressive_frac": 0.25,
+  "headline_by_outcome": {
+    "auroc": {
+      "mean_delta_vs_full": -0.0443,
+      "n_material_worse": 9,
+      "n_material_better": 0,
+      "n_material_cells": 9,
+      "n_cells": 9
+    },
+    "ece": {
+      "mean_delta_vs_full": 0.0125,
+      "n_material_worse": 5,
+      "n_material_better": 2,
+      "n_material_cells": 7,
+      "n_cells": 9
+    },
+    "brier": {
+      "mean_delta_vs_full": 0.0228,
+      "n_material_worse": 7,
+      "n_material_better": 1,
+      "n_material_cells": 8,
+      "n_cells": 9
+    },
+    "aurc": {
+      "mean_delta_vs_full": 0.0545,
+      "n_material_worse": 9,
+      "n_material_better": 0,
+      "n_material_cells": 9,
+      "n_cells": 9
+    },
+    "auroc_gap": {
+      "mean_delta_vs_full": 0.0084,
+      "n_material_worse": 2,
+      "n_material_better": 0,
+      "n_material_cells": 2,
+      "n_cells": 9
+    },
+    "ece_gap": {
+      "mean_delta_vs_full": -0.0039,
+      "n_material_worse": 1,
+      "n_material_better": 3,
+      "n_material_cells": 4,
+      "n_cells": 9
+    }
+  },
+  "calib_sha256": "19f9a06a8f411f2cb0bfc83a470b8abe9be3e8d2481b8d5686994f21903b99e1"
+}

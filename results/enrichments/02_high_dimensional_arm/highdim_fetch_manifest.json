@@ -1,0 +1,62 @@
+[
+  {
+    "dataset": "arcene",
+    "n": 200,
+    "p": 10000,
+    "balance": "-1:112/1:88",
+    "download_url_used": "UCI/OpenML",
+    "sha256": "779d678207b9a8c0ba8f2f5ecdb2216d9f98bf475ab040e806797efd36331bc5",
+    "bytes": 1900005,
+    "cited_source_of_record": "Guyon et al., NIPS 2003 feature-selection challenge",
+    "provenance": "UCI id 167 (CC BY 4.0) / OpenML 1458,41157",
+    "geo_accession": "n/a (mass-spec challenge set)"
+  },
+  {
+    "dataset": "arrhythmia",
+    "n": null,
+    "p": null,
+    "balance": null,
+    "download_url_used": "UCI id 5",
+    "sha256": null,
+    "bytes": null,
+    "cited_source_of_record": "Guvenir et al. 1997",
+    "provenance": "UCI id 5",
+    "geo_accession": "n/a (clinical ECG)"
+  },
+  {
+    "dataset": "Prostate-GE",
+    "n": 102,
+    "p": 5966,
+    "balance": "1:50/2:52",
+    "download_url_used": "scikit-feature raw .mat (convenience mirror)",
+    "sha256": "050b598534dbc662f23e30f39b41354b61d02ab8567837bcf9b1091c1c636ab4",
+    "bytes": 1524983,
+    "cited_source_of_record": "Singh et al., Cancer Cell 2002",
+    "provenance": "original study; scikit-feature .mat mirror (convenience)",
+    "geo_accession": "confirm (Singh 2002 prostate microarray)"
+  },
+  {
+    "dataset": "GLI-85",
+    "n": 85,
+    "p": 22283,
+    "balance": "1:26/2:59",
+    "download_url_used": "scikit-feature raw .mat (convenience mirror)",
+    "sha256": "c1170b0b7ef8dc8e5d4982deb179da81035c766a5c2b74aff55270d65007b57a",
+    "bytes": 8743262,
+    "cited_source_of_record": "Freije et al., Cancer Res 2004 (glioma)",
+    "provenance": "original study; scikit-feature .mat mirror",
+    "geo_accession": "confirm (Freije glioma)"
+  },
+  {
+    "dataset": "SMK-CAN-187",
+    "n": 187,
+    "p": 19993,
+    "balance": "1:90/2:97",
+    "download_url_used": "scikit-feature raw .mat (convenience mirror)",
+    "sha256": "96ff62a9dad001b4bb28a5c31f69e9c41fb1f42d02e4b39c31e4a57b46238aa7",
+    "bytes": 11861244,
+    "cited_source_of_record": "Spira et al., Nat Med 2007 (airway smokers)",
+    "provenance": "original study; scikit-feature .mat mirror",
+    "geo_accession": "confirm (Spira airway)"
+  }
+]
