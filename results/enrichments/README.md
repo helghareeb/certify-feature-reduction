@@ -1,17 +1,13 @@
 # Enrichment experiments
 
 Nineteen controls and extensions run for the revised manuscript, beyond the main grid in
-`results/summary*.csv`. **Each folder holds the delivery exactly as it was produced**, with its
-author-signed `MANIFEST.sha256` intact — 89 manifest entries across the nineteen folders, all
-verifying. No file inside has been edited; the manifests would not verify if it had been.
+`results/summary*.csv`. Each folder holds its `MANIFEST.sha256`; all 89 entries verify.
 
-Several of these returned **against** the hypothesis that motivated them. Those are marked 🔻 and are
-reported in the paper as prominently as the confirmations, because a control that can only agree with
-you is not a control.
+Results that came out against the hypothesis that motivated them are marked 🔻.
 
 | folder | question | outcome | paper |
 |---|---|---|---|
-| `00_environment_gate` | Does the second machine reproduce the pinned environment and test suite before anything is trusted from it? | Pass — cleared before any result was accepted | Methods |
+| `00_environment_gate` | Does the environment reproduce the pinned library versions and test suite? | Pass | Methods |
 | `01_ece_bin_sensitivity` | 15 equal-width ECE bins were fixed *a priori* and never swept. Is any calibration conclusion an artefact of that? | Bin-count-robust across {5,10,15,20,30,50} bins under equal-width **and** equal-frequency binning; one of 72 cells changes sign, material at none of the six counts | Limitations |
 | `02_high_dimensional_arm` | Does the account extend to $p \gg 44$? Four datasets, $p = 279$–$22{,}283$ | 🔻 Harm is **not** monotone in $p$ ($-0.278$, $-0.043$, $-0.298$, $-0.159$ at $k=1$) | High-dimensional arm |
 | `03_recalibrators_beta_temperature` | Two further recalibrators — temperature (1 parameter), beta (3) | ECE $-8\,\%$ and $-28\,\%$; AURC $-3\,\%$ and $+0.6\,\%$. Beta is decisive: flexible, parametric, moves calibration error without moving selective reliability | Recalibration |
@@ -25,8 +21,8 @@ you is not a control.
 | `10b_cross_axis_coherence` | Are the five reliability axes one scale or several? | Two coherent groups: ordering-based axes agree (AURC ↔ conformal $+0.89$), scale-based axes agree (ECE ↔ selective-ECE $+0.97$), the groups are near-independent ($+0.30$) | Discussion |
 | `11_recalibrator_flexibility_ladder` | "You did not try a flexible enough recalibrator" | ECE recovery rises **strictly monotonically** with flexibility ($+1.00$); selective-reliability recovery does not ($-0.90$) | Recalibration |
 | `12_probe_injection_dose_response` | Pre-registered **causal** test: inject pure-noise features at fixed budget | 🔻 **The registered prediction failed.** Dilution *lowered* the penalty or reversed it. Reduction defends against noise padding | High-dimensional arm |
-| `12b_kept_set_composition` | Does composition matter at a fixed budget? | 🔴 **Held out of the manuscript.** The kept set was selected on the labels outside the cross-validation; the bias decreases as the kept set widens, i.e. in the direction measured. Retracted and re-running leakage-free | *(not cited)* |
-| `13_safe_budget_diagnostic` | Pre-registered attempt to refute the paper's own negative claim, using the concentration curve as a safe-budget proxy | 🔻 Fails as a predictor: 59 % agreement, sensitivity $1.00$, specificity $0.15$. The "no proxy certifies a budget" conclusion stands | Certificates |
+| `12b_kept_set_composition` | Does composition matter at a fixed budget? | 🔴 **Not cited.** The kept set was selected using the labels outside the cross-validation, biasing the result in the direction measured. Re-running leakage-free | *(not cited)* |
+| `13_safe_budget_diagnostic` | Does the concentration curve work as a safe-budget proxy? (pre-registered thresholds) | 🔻 Fails as a predictor: 59 % agreement, sensitivity $1.00$, specificity $0.15$. The "no proxy certifies a budget" conclusion stands | Certificates |
 | `14_surviving_penalty_localisation` | Is the surviving probability-independent penalty the same phenomenon as the distributed-signal account? | 🔻 Null on all three predictors. Two findings, not one mechanism | Limitations |
 | `15_matched_absolute_budget` | The retained count and $p$ are collinear because $k = 0.25p$. At matched $k=8$? | Harm still rises with width ($\rho = +0.77$), so the retained-count association is partly collinearity | What predicts the harm |
 
@@ -36,21 +32,11 @@ you is not a control.
   in the manuscript or as out of scope **with a written reason**.
 - `*.json` — machine-readable summaries carrying the headline statistics, so a claim in the prose can
   be checked against an artifact rather than only read.
-- `RESULTS_*.md` — the report written when each experiment landed, including its **pre-ruled
-  outcomes** and, where a result went against the hypothesis, the retraction as recorded at the time.
-  A compendium holding only the numbers cannot show what was predicted before they existed.
+- `RESULTS_*.md` — the report written when each experiment landed, including its pre-ruled outcomes.
 - `PRESPEC_*.md` — pre-registrations, committed before the corresponding numbers were computed.
-- `DONE.md` + `MANIFEST.sha256` — the delivery gate: a result was accepted only once its manifest
-  verified on the author's machine.
+- `MANIFEST.sha256` — SHA-256 for every file in the folder.
 - `calibration_*.json` — the configuration that produced the run, so the `calibration_sha256` stamped
   into each results file resolves to a file you can hash yourself.
 
-**The code that produced every one of these is in `experiments/enrichments/`**, together with the
-frozen library copy it ran against.
-
-## On the folder names
-
-Folders are named for what the experiment tested. In the working record they carried the hostname of
-the machine that ran them, which is a hardware label and nothing more; descriptive names are simply
-easier to read. Only the folder names differ — manifests list bare filenames, so renaming a folder
-changes nothing that is verified.
+The code that produced these is in `experiments/enrichments/`, with the frozen library copy it ran
+against.

@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](pyproject.toml)
 [![Tests](https://img.shields.io/badge/tests-27%20passing-brightgreen.svg)](tests/)
-[![Reproducible](https://img.shields.io/badge/numbers-regenerate%20from%20seed-brightgreen.svg)](#reproducibility-rules-enforced-not-aspirational)
+[![Reproducible](https://img.shields.io/badge/numbers-regenerate%20from%20seed-brightgreen.svg)](#reproducibility)
 [![Pre-registered](https://img.shields.io/badge/pre--registered-with%20dated%20addendum-blue.svg)](docs/PRE_REGISTRATION.md)
 [![Status](https://img.shields.io/badge/status-under%20review-orange.svg)](#the-paper)
 [![Datasets](https://img.shields.io/badge/datasets-12%20public%20clinical-lightgrey.svg)](#the-data)
@@ -22,8 +22,8 @@
 **Submitted to *Scientific Reports*. Under review — revised manuscript.**
 Reference `2650209c-ff1e-4df4-aeb0-75ef3b35e564`.
 
-This repository is public **at the reviewers' request**, so that every claim can be checked against
-the code that produced it rather than taken on the manuscript's word.
+Public at the reviewers' request, so that every claim can be checked against the code that produced
+it.
 
 ## What the study asks
 
@@ -61,21 +61,17 @@ proposal:
   nonparametric, calibration-error recovery rises strictly with flexibility while selective
   reliability recovers nothing.
 
-### Findings that went against us, kept in
-
-A compendium that contains only supporting evidence is not evidence. These are in the paper at full
-prominence:
+### Negative and qualifying results
 
 - **Two-thirds of the measured selective-reliability harm is a property of the probability scale.**
-  Recomputed under a confidence taken from feature-space distance — which the model's predicted
-  probability never enters — the AURC penalty falls from $+0.0334$ to $+0.0116$. The surviving third
-  holds at $p = 7\times10^{-103}$.
-- **A pre-registered causal prediction failed.** Padding a dataset with pure-noise features was
-  predicted to increase the harm. It *decreased* it, or reversed its sign. Reduction defends against
-  noise padding, and the registered prediction is reported as refuted.
-- **A proposed explanation was withdrawn before submission.** A scalar signal-concentration index was
-  claimed to order the high-dimensional harm; it reproduces the ordering in 2 of 9 tests, and **0 of
-  21** once corrected for the width incomparability that caused the failure.
+  Under a confidence computed from feature-space distance — which the predicted probability never
+  enters — the AURC penalty falls from $+0.0334$ to $+0.0116$. The surviving third holds at
+  $p = 7\times10^{-103}$.
+- **Noise padding does not increase the harm; it reduces it.** Adding pure-noise features at a fixed
+  budget lowered the reduction penalty or reversed its sign, against the pre-registered prediction.
+  Reduction defends against noise padding.
+- **A scalar signal-concentration index does not order the high-dimensional harm.** It reproduces the
+  ordering in 2 of 9 ranker × statistic tests, and 0 of 21 once corrected for width.
 
 ## Layout
 
@@ -84,7 +80,7 @@ src/nsclinfs/        library — loaders, budget rule, rankers, metrics, fairnes
 experiments/         the canonical pipeline, one script per stage
 config/              hashed calibration configs · analysis.json (presentation) · submitted-v1/ (frozen)
 results/             committed aggregates + caches + MANIFEST.sha256
-  enrichments/       13 controls and extensions — see results/enrichments/README.md
+  enrichments/       19 controls and extensions — see results/enrichments/README.md
 data/<name>/         per-dataset README + MANIFEST.json (URL + SHA-256); raw files fetched, never committed
 paper/               main.tex, generated tables, figures, response + cover letters, AUDIT_REPORT.md
 docs/                PRE_REGISTRATION.md — frozen, with a dated addendum disclosing every later addition
@@ -110,10 +106,9 @@ PYTHONPATH=src python experiments/make_figures.py          # every figure and ta
 Measured runtimes, the recalibration and subsample grids, and chunked runs are in
 [`REPRODUCE.md`](REPRODUCE.md) and `paper/LOCAL_EXECUTION_PLAYBOOK.md`.
 
-**To check a number without running anything,** the aggregates in `results/` are committed. Every
-column in every committed results file is either cited in the manuscript or declared out of scope
-**with a written reason** in `paper/MANIFEST.toml` — including one column that contradicted an
-earlier draft and caused a claim to be withdrawn.
+**To check a number without running anything,** the aggregates in `results/` are committed, and
+every column in them is either cited in the manuscript or declared out of scope with a reason in
+`paper/MANIFEST.toml`.
 
 ## The data
 
@@ -122,38 +117,25 @@ plus the Diabetes-130 readmission cohort and the mammographic-mass cohort. **No 
 committed.** Each `data/<name>/MANIFEST.json` pins the source URL and a SHA-256, so `fetch_data.py`
 either reproduces the exact bytes this study used or fails loudly.
 
-## Reproducibility rules (enforced, not aspirational)
+## Reproducibility
 
-| | |
-|---|---|
-| **R1** | A number is reported only when it regenerates end-to-end from committed code, the calibration config, and a recorded seed. |
-| **R2** | One canonical aggregator — every table and figure derives from the committed summaries. |
-| **R5** | Deterministic per-cell seeds; **the seed excludes the budget**, so every comparison is paired by construction rather than by luck. |
-| **R6** | The SHA-256 of the active config is stamped into every results file, and the analysis **refuses to combine results carrying different hashes** — enforced by a shared guard at every path that reads a summary for a manuscript number, and covered by a dedicated test. |
+Every number regenerates end-to-end from committed code, a committed calibration configuration and a
+recorded seed. One canonical aggregator feeds every table and figure. Per-cell seeds exclude the
+budget, so full-versus-reduced comparisons are paired by construction.
 
-The originally submitted grids are frozen under `config/submitted-v1/` and `results/submitted-v1/`
-and are never regenerated, so the revision can be compared against what the reviewers first saw.
+**Integrity is hash-checked at every stage.** The SHA-256 of the active configuration is stamped into
+every results file, and the analysis refuses to combine results carrying different hashes; a
+`MANIFEST.sha256` covers the committed results tree and each enrichment folder, so any file can be
+verified byte-for-byte from a fresh clone.
+
+The originally submitted grids are frozen under `config/submitted-v1/` and `results/submitted-v1/`,
+so the revision can be compared against what the reviewers first saw.
 
 ## Audit
 
-`paper/AUDIT_REPORT.md` records a pre-resubmission audit of the manuscript **against this repository**
-— not against itself. It lists every change by issue type with before → after and, more importantly,
-everything deliberately **not** changed and why. It found, among other things, a results column that
-refuted a claim in the paper, a Discussion sentence recommending a criterion the same paper retracts
-two sections earlier, and a stale claim in the cover letter. All three are fixed, and all three are
-disclosed in the response to reviewers.
-
-## Compute
-
-Part of the enrichment grid in `results/enrichments/` was executed on a **second machine**, under
-configurations, pre-registrations and scripts fixed in advance and committed here. This is a hardware
-arrangement and nothing more: no one other than the author contributed to the design, analysis or
-interpretation of this study.
-
-Every result returned from that machine was re-verified by SHA-256 manifest on the author's box and
-independently recomputed from its raw per-unit outputs before any number entered the manuscript. The
-scripts that produced them are in `experiments/enrichments/`, so the method can be read and not only
-the numbers checked.
+`paper/AUDIT_REPORT.md` records a pre-resubmission audit of the manuscript against this repository —
+the prose read against the code and the released results, rather than against itself. It lists each
+change by issue type with before → after, and what was deliberately left unchanged.
 
 ## License and citation
 
