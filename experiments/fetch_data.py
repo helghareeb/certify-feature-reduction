@@ -16,8 +16,11 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import http.client
 import json
 import sys
+import time
+import urllib.error
 import urllib.request
 import zipfile
 from pathlib import Path
@@ -72,14 +75,55 @@ def sha256_of(path: Path) -> str:
     return h.hexdigest()
 
 
+# A source that is briefly unreachable is a fact about the network on the day, not about the study.
+# Without a retry, one 503 from a mirror fails the whole verification, and a red badge on a public
+# compendium reads as "the numbers do not regenerate" to exactly the person who came to check.
+# Only genuinely transient statuses are retried; 404 and 403 fail on the first attempt, because a
+# source that has moved or closed is a real finding, and surfacing it is what the monthly schedule
+# in .github/workflows/verify.yml is for. The SHA-256 check downstream is untouched either way: a
+# retry can change whether bytes arrive, never which bytes are accepted.
+TRANSIENT_STATUS = {408, 425, 429, 500, 502, 503, 504}
+FETCH_ATTEMPTS = 5
+
+
+def _is_transient(exc: BaseException) -> bool:
+    if isinstance(exc, urllib.error.HTTPError):  # a subclass of URLError, so test it first
+        return exc.code in TRANSIENT_STATUS
+    return isinstance(exc, (urllib.error.URLError, TimeoutError, ConnectionError,
+                            http.client.IncompleteRead))
+
+
+def _retry_delay(exc: BaseException, attempt: int) -> float:
+    """Seconds to wait before the next attempt, honouring Retry-After when the server sends one."""
+    if isinstance(exc, urllib.error.HTTPError) and exc.headers:
+        after = exc.headers.get("Retry-After")
+        if after:
+            try:
+                return min(float(after), 60.0)
+            except ValueError:
+                pass  # HTTP-date form; fall through to the backoff below
+    return float(2 ** attempt)  # 2, 4, 8, 16 s
+
+
 def fetch(url: str, dest: Path) -> None:
     dest.parent.mkdir(parents=True, exist_ok=True)
     req = urllib.request.Request(url, headers={"User-Agent": "certify-feature-reduction fetch_data/1.0"})
     tmp = dest.with_suffix(dest.suffix + ".part")
-    with urllib.request.urlopen(req, timeout=120) as r, open(tmp, "wb") as f:
-        while chunk := r.read(1 << 20):
-            f.write(chunk)
-    tmp.replace(dest)
+    for attempt in range(1, FETCH_ATTEMPTS + 1):
+        try:
+            with urllib.request.urlopen(req, timeout=120) as r, open(tmp, "wb") as f:
+                while chunk := r.read(1 << 20):
+                    f.write(chunk)
+            tmp.replace(dest)
+            return
+        except Exception as e:  # noqa: BLE001 - re-raised below unless it is worth another attempt
+            tmp.unlink(missing_ok=True)  # a half-written .part must never be hashed
+            if attempt == FETCH_ATTEMPTS or not _is_transient(e):
+                raise
+            delay = _retry_delay(e, attempt)
+            print(f"  transient failure ({e}); retrying in {delay:.0f}s "
+                  f"[attempt {attempt + 1}/{FETCH_ATTEMPTS}]", flush=True)
+            time.sleep(delay)
 
 
 def unzip_diabetes(raw_dir: Path) -> None:
