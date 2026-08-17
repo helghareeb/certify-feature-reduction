@@ -20,7 +20,7 @@
 > Haitham A. El-Ghareeb · Information Systems Department, Faculty of Computers and Information
 > Sciences, Mansoura University, Egypt
 
-**Under review at *Scientific Reports*.**
+**Under review at *Scientific Reports*** — first revision submitted 17 August 2026.
 
 Archived at Zenodo: [10.5281/zenodo.21978878](https://doi.org/10.5281/zenodo.21978878)
 (version-independent; resolves to the current release).
