@@ -1,0 +1,74 @@
+{
+  "STATUS": "validated",
+  "draws": 2000,
+  "seed": 20260626,
+  "alpha": 0.1,
+  "bins": 15,
+  "note": "cache-only metric diagnostics; no model fitted, no new outcome defined",
+  "worked_example": {
+    "dataset": "mammographic",
+    "cell": {
+      "method": "mutual_info",
+      "classifier": "logistic",
+      "calibrate": "none"
+    },
+    "budgets": [
+      "frac:1",
+      "frac:0.75",
+      "frac:0.5",
+      "frac:0.33",
+      "frac:0.25",
+      "k:1",
+      "k:2",
+      "k:4"
+    ],
+    "n_reps": 30,
+    "ece_full_over_reduced": 0.45,
+    "resolution_full_over_reduced": 1.21,
+    "sd_p_full_over_reduced": 1.3,
+    "conformal_penalty_transductive": 0.2716,
+    "conformal_penalty_split": 0.2587,
+    "conformal_penalty_bias": 0.0129,
+    "conformal_penalty_bias_pct": 5.0,
+    "aurc_penalty_frac:0.25": 0.0714,
+    "aurc_perm_ci_pct_of_penalty_frac:0.25": 5.2,
+    "aurc_penalty_k:1": 0.0714,
+    "aurc_perm_ci_pct_of_penalty_k:1": 5.2
+  },
+  "secondary_example": {
+    "dataset": "diabetes130",
+    "cell": {
+      "method": "mutual_info",
+      "classifier": "logistic",
+      "calibrate": "none"
+    },
+    "budgets": [
+      "frac:1",
+      "frac:0.75",
+      "frac:0.5",
+      "frac:0.33",
+      "frac:0.25",
+      "k:1",
+      "k:2",
+      "k:4",
+      "k:8"
+    ],
+    "n_reps": 30,
+    "ece_full_over_reduced": 10.22,
+    "resolution_full_over_reduced": 15.65,
+    "sd_p_full_over_reduced": 4.1,
+    "conformal_penalty_transductive": -0.0011,
+    "conformal_penalty_split": -0.0005,
+    "conformal_penalty_bias": -0.0006,
+    "conformal_penalty_bias_pct": null,
+    "aurc_penalty_frac:0.25": 0.0039,
+    "aurc_perm_ci_pct_of_penalty_frac:0.25": 3.4,
+    "aurc_penalty_k:1": 0.0297,
+    "aurc_perm_ci_pct_of_penalty_k:1": 3.0
+  },
+  "conformal_max_abs_set_size_bias": 0.0123,
+  "conformal_max_abs_bias_in_sems": 11.3,
+  "conformal_max_coverage_excess": 0.0188,
+  "aurc_max_perm_ci_width": 0.0037,
+  "aurc_max_perm_sd": 0.0009
+}

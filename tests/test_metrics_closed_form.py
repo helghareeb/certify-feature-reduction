@@ -7,7 +7,15 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from nsclinfs.fairness import auroc_gap
-from nsclinfs.metrics import mean_net_benefit, net_benefit
+from nsclinfs.metrics import (
+    brier_score_loss,
+    expected_calibration_error,
+    mean_net_benefit,
+    mean_net_benefit_treat_all,
+    murphy_decomposition,
+    net_benefit,
+    net_benefit_treat_all,
+)
 
 
 def test_net_benefit_closed_form():
@@ -49,6 +57,69 @@ def test_mean_net_benefit_honors_grid_args():
     assert default == explicit
     narrow = mean_net_benefit(y, p, 0.1, 0.3, 5)
     assert narrow != default
+
+
+def test_treat_all_reference_matches_the_model_that_treats_everyone():
+    """`net_benefit_treat_all` must agree with running `net_benefit` on p == 1."""
+    y = np.array([1, 0, 0, 0, 1, 0, 0])
+    ts = np.linspace(0.05, 0.5, 19)
+    assert np.allclose(net_benefit_treat_all(y.mean(), ts), net_benefit(y, np.ones(len(y)), ts))
+    assert abs(mean_net_benefit_treat_all(y.mean())
+               - mean_net_benefit(y, np.ones(len(y)))) < 1e-12
+
+
+def test_treat_all_beats_treat_none_exactly_below_prevalence():
+    """The threshold at which treat-all stops paying is the prevalence itself, which is why a
+    range lying entirely below prevalence is a range in which treat-all is hard to beat."""
+    prev = 0.7
+    assert net_benefit_treat_all(prev, np.array([prev]))[0] < 1e-12
+    assert net_benefit_treat_all(prev, np.array([prev - 0.1]))[0] > 0.0     # treat-all pays
+    assert net_benefit_treat_all(prev, np.array([prev + 0.1]))[0] < 0.0     # treat-none pays
+
+
+def test_murphy_decomposition_reconstructs_the_binned_brier_score():
+    """reliability - resolution + uncertainty == Brier of the bin-mean forecast, exactly, and the
+    residual against the unbinned Brier score is reported rather than absorbed."""
+    rng = np.random.default_rng(3)
+    for n, rate in ((500, 0.3), (2000, 0.11), (300, 0.8)):
+        y = (rng.random(n) < rate).astype(int)
+        p = np.clip(rng.random(n) * 0.7 + y * 0.25, 0, 1)
+        d = murphy_decomposition(y, p)
+        assert abs(d["reliability"] - d["resolution"] + d["uncertainty"]
+                   - d["brier_binned"]) < 1e-12
+        assert abs(d["brier"] - brier_score_loss(y, p)) < 1e-12
+        assert abs(d["binning_residual"] - (d["brier"] - d["brier_binned"])) < 1e-12
+
+
+def test_murphy_decomposition_is_exact_when_the_forecast_is_already_binned():
+    """With one predicted value per bin there is nothing for the binning to discard, so the
+    classical identity closes against the true Brier score."""
+    rng = np.random.default_rng(11)
+    y = (rng.random(3000) < 0.4).astype(int)
+    levels = np.array([0.1, 0.3, 0.5, 0.7, 0.9])          # each lands in its own 15-width bin
+    p = levels[rng.integers(0, len(levels), len(y))]
+    d = murphy_decomposition(y, p)
+    assert abs(d["binning_residual"]) < 1e-12
+    assert abs(d["reliability"] - d["resolution"] + d["uncertainty"]
+               - brier_score_loss(y, p)) < 1e-12
+
+
+def test_a_base_rate_constant_predictor_is_calibrated_and_has_no_resolution():
+    """The degenerate case the decomposition exists to expose: a model that predicts the base
+    rate for everyone scores near-zero calibration error while carrying no information. ECE
+    cannot tell it apart from a good model; resolution can."""
+    rng = np.random.default_rng(4)
+    y = (rng.random(4000) < 0.12).astype(int)
+    constant = np.full(len(y), y.mean())
+    informative = np.clip(0.12 + (y * 2 - 1) * 0.08 + rng.normal(0, 0.01, len(y)), 0, 1)
+
+    flat = murphy_decomposition(y, constant)
+    good = murphy_decomposition(y, informative)
+
+    assert expected_calibration_error(y, constant) < 1e-9        # perfectly calibrated
+    assert flat["resolution"] < 1e-9                             # and perfectly uninformative
+    assert good["resolution"] > 100 * max(flat["resolution"], 1e-12)
+    assert flat["n_occupied"] == 1 and flat["largest_bin_share"] == 1.0
 
 
 def test_auroc_gap_two_group_synthetic():

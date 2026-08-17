@@ -1,0 +1,26 @@
+{
+  "STATUS": "validated",
+  "threshold_grid": {
+    "t_lo": 0.05,
+    "t_hi": 0.5,
+    "n_thresholds": 19
+  },
+  "prevalence_source": "cross-dataset correlates table (tier8_correlates_clinical.csv); diabetes130 from the full-cohort cache (n=101763)",
+  "datasets_whose_range_excludes_prevalence": [
+    "ilpd",
+    "spectf"
+  ],
+  "datasets_never_beating_treat_all": [
+    "ilpd",
+    "spectf"
+  ],
+  "n_datasets": 12,
+  "n_beating_treat_all_at_full_budget": 10,
+  "smallest_margin_over_treat_all": {
+    "dataset": "cleveland",
+    "margin": 0.1111
+  },
+  "material_net_benefit_cells_at_25pct": 80,
+  "material_cells_from_uninformative_datasets": 11,
+  "material_cells_retained": 69
+}

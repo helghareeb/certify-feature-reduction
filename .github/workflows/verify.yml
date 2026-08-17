@@ -98,10 +98,12 @@ jobs:
                 f"({100*d['n_flip_majority']/d['n_patients']:.1f} %), "
                 f"{d['n_missed_treatment']} moved off treatment")
           EOF
-      - name: the two cache-only audit arms reproduce
+      - name: the cache-only audit arms reproduce
         run: |
           PYTHONPATH=src python experiments/enrichments/compute_dataset_level_inference.py
           PYTHONPATH=src python experiments/enrichments/compute_flip_decomposition.py
+          PYTHONPATH=src python experiments/enrichments/compute_metric_diagnostics.py
+          PYTHONPATH=src python experiments/enrichments/compute_net_benefit_defaults.py
           # Values, not bytes: re-running on a different platform writes different line endings
           # while computing identical numbers. See the caveat in REPRODUCE.md.
           python - <<'EOF'
@@ -116,4 +118,30 @@ jobs:
           if bad:
               print("DECOMPOSITION DIFFERS (expected, got):", bad); sys.exit(1)
           print("ok: decomposition reproduces", checks)
+          EOF
+      - name: the metric diagnostics reproduce their published figures
+        # The three numbers the manuscript's Threats section leans on. Each is a property of a
+        # metric rather than of a model, so a silent drift here would be invisible everywhere else.
+        run: |
+          python - <<'EOF'
+          import json, sys
+          d = json.load(open(
+              "results/enrichments/20_metric_diagnostics/metric_diagnostics.json"))
+          n = json.load(open(
+              "results/enrichments/21_net_benefit_default_strategies/"
+              "net_benefit_default_strategies.json"))
+          checks = {
+              "readmission ECE fold-improvement": (d["secondary_example"]["ece_full_over_reduced"], 10.22),
+              "readmission resolution fold-loss": (d["secondary_example"]["resolution_full_over_reduced"], 15.65),
+              "conformal set-size penalty overstatement %": (d["worked_example"]["conformal_penalty_bias_pct"], 5.0),
+              "largest conformal coverage excess": (d["conformal_max_coverage_excess"], 0.0188),
+              "widest AURC permutation interval": (d["aurc_max_perm_ci_width"], 0.0037),
+              "datasets beating treat-all": (n["n_beating_treat_all_at_full_budget"], 10),
+              "material net-benefit cells retained": (n["material_cells_retained"], 69),
+          }
+          bad = {k: (want, got) for k, (got, want) in checks.items() if got != want}
+          if bad:
+              print("METRIC DIAGNOSTICS DIFFER (expected, got):", bad); sys.exit(1)
+          for k, (got, _) in checks.items():
+              print(f"ok: {k} = {got}")
           EOF
