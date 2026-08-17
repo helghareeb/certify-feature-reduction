@@ -3,7 +3,7 @@
 **Research compendium — everything behind the paper, and enough to disagree with it.**
 
 [![verify](https://github.com/helghareeb/certify-feature-reduction/actions/workflows/verify.yml/badge.svg)](https://github.com/helghareeb/certify-feature-reduction/actions/workflows/verify.yml)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21978878.svg)](https://doi.org/10.5281/zenodo.21978878)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.21978878-blue.svg)](https://doi.org/10.5281/zenodo.21978878)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](pyproject.toml)
 [![Reproducible](https://img.shields.io/badge/numbers-regenerate%20from%20seed-brightgreen.svg)](#reproducibility)
