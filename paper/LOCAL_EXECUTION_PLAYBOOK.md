@@ -48,6 +48,7 @@ skipped by expected row count; shard writes are atomic. Full-burn totals: 87 + 2
 | cover letter plain-text version, generated from the .tex so the two cannot drift | `python experiments/mk_cover_txt.py` (run 2026-08-15; writes `paper/cover_letter.txt`, no manuscript number) |
 | public-compendium sync check (no manuscript number; `--check` exits non-zero if normalisation is due) | `python scripts/sync_public.py --check` (run 2026-08-16) |
 | results manifest (write / verify) | `python scripts/make_results_manifest.py [--check]` (run 2026-08-16) |
+| external archive: mirror both repos + intermediates + the delivery channel, then re-hash **by reading back from the destination** | `python scripts/sync_archive.py [--verify]` (run 2026-08-16; incremental, so an update after a small change takes seconds) |
 | provenance map: every result -> its producing script | `python scripts/provenance_map.py --check` (run 2026-08-16) |
 | v1-vs-v2 invariance report | `python experiments/v1_v2_diff.py` |
 
@@ -78,6 +79,7 @@ here resolve the repository root from `__file__` so they run from a clone (`NSCL
 | `compute_p4_ASRUN.py` | localisation of the surviving penalty | cache-only |
 | `compute_p5_ASRUN.py` | matched absolute budget | cache-only |
 | `compute_p6.py` | combined-confidence arm | not yet in the manuscript |
+| `paired_ladder_steps.py` | the within-unit paired comparison of the Arm B ladder | analysis only; possible only because the v4 seed excludes the kept-set size |
 | `compute_p1.py`, `compute_p1_v2.py` | probe-injection dose-response (Arm A) and the superseded Arm B | Arm A is in the manuscript; **Arm B is not** — its kept set was selected outside the cross-validation |
 | `compute_p1b_v3.py` | Arm B re-run with in-fold kept-set selection | running |
 ## 3. Manuscript + response letter

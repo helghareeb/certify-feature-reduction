@@ -1,5 +1,6 @@
-# DONE — P1 Arm A (probe injection) with dispersion
-2026-08-15 20:25 AST. Shipped ahead of Arm B (still running). CI-supported: cleveland harm shrinks
-(material), spectf flips to beneficial (material), mammographic flat/robust -> reduction DEFENDS against
-injected noise; arcene harm != irrelevant-feature-count. 180 units/cell, bootstrap 95% CI. Provenance =
-compute_p1_v2.py + PRESPEC_p1.md (P1 computes fresh; no calib config).
+# DONE — P1 FINAL (Arm A + leakage-free Arm B v3) — 2026-08-16 15:45 AST
+Arm B v3 finished 15:41 (~15.7h; L1-logistic on arcene's 10k features is the long tail). ANCHOR PASSES:
+keep=10000 penalty +0.0869 ≈ v2 +0.0914 (Δ0.0045 seed noise) → harness sound. Leakage-free conclusion HOLDS
+and is cleaner: at fixed k=25, penalty rises monotonically (+0.027→+0.087, CIs disjoint) and reduced-25
+AUROC falls (0.869→0.824) as the kept set widens ⇒ arcene's harm = distributed signal (large effective
+dimensionality), NOT irrelevant-feature padding (Arm A). Retraction + fix reported in full. R6 separate.

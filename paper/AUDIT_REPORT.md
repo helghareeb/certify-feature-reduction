@@ -201,6 +201,36 @@ knowledge that still fails is a stronger negative, not a weaker one. Neither is 
 point is moot here; but it is the direction to check first whenever a null rests on a constructed
 predictor.
 
+### 3.9 The complete code read
+
+The audit above began with the enrichment scripts because that is where a delegated experiment can
+diverge from its specification. It has since been extended to **every line of executed code in the
+repository** — 6,307 lines across 64 files: the library, the pipeline, the enrichments, the frozen
+copy they ran against, and the tests.
+
+**Nothing further was found.** The three findings already recorded — the kept-set selection in one
+enrichment arm, six machine-specific paths, and one copied docstring — remain the complete list.
+
+Four properties the manuscript asserts were verified at their source rather than taken from a
+docstring:
+
+| assertion | where it is true in the code |
+|---|---|
+| Comparisons are paired by construction | `run.py` derives the per-cell seed from (dataset, ranker, learner, repetition) and **excludes both the budget and the calibration mode**, so every level of every arm shares one cross-validation split. A test asserts it: `test_seed_constant_across_budgets` requires one distinct seed per (dataset, ranker, learner, repetition) across all budgets |
+| A result is material only when significance **and** interval agree | `run_clinical_fs.py`: `material = p_holm < alpha and (diff_ci_lo > 0 or diff_ci_hi < 0)`. Neither condition alone sets it |
+| The protected attribute is never a model feature | `data.py` returns it as a third object; it reaches only the four subgroup-gap functions and never the feature matrix |
+| The leakage firewall holds | `test_leakage_firewall_shuffled_labels` permutes the labels **before the whole pipeline** and requires AUROC within 0.08 of chance. In-fold selection, scaling or fitting that manufactured signal would fail it |
+
+Two guards are worth naming because they protect against silent, not loud, failure. `merge_shards.py`
+computes the row count the configuration implies and **refuses to merge** when the shards do not match
+it — a summary quietly built on fewer cells than claimed is exactly the defect nobody notices.
+`fetch_data.py` collects every hash mismatch and exits non-zero rather than proceeding on different
+bytes.
+
+The committed data satisfies the manuscript's own arithmetic: 12 datasets × 3 rankers × 3 learners
+gives **108 distinct cells** in the released summary, each aggregating **30** repetitions, over 28,080
+raw rows.
+
 ---
 
 ## 4. Deliberately **not** changed, and why

@@ -60,7 +60,7 @@ columns = ["dataset", "method", "classifier", "budget", "calibrate", "rep"]
 "k_features" = "the realised retained count; reported as k throughout Section 4.7"
 "n_features" = "the dataset feature count; reported as p in Table 1 and prose"
 "mean" = "per-budget outcome mean; reported via table fragments"
-"n" = "repetition count per aggregate (30); stated in Methods"
+"n" = "cohort size, used as a candidate predictor in the cross-dataset correlate analysis. KNOWN STALE LABEL, verified harmless 2026-08-16: in tier8_correlates_clinical.csv the diabetes130 row carries n=6000 from the superseded subsample arm while its harm values (+0.0306, +0.00813) are the full-cohort ones. Checked rather than assumed -- Spearman uses ranks, and diabetes130 is the largest cohort under either value, so every reported correlation is identical both ways (+0.0490 and +0.2238). No number moves. The label is nonetheless misleading in a released file and a corrected re-ship has been requested; the file is not edited here because it sits inside an author-signed manifest."
 "delta" = "the paired difference -- the paper's primary estimand, reported in every results table"
 "ci_lo" = "lower bootstrap CI bound; CIs are reported in aggregate as 'bootstrap CI excludes zero'"
 "ci_hi" = "upper bootstrap CI bound; as above"
@@ -125,7 +125,7 @@ columns = ["dataset", "method", "classifier", "budget", "calibrate", "rep"]
 "dose" = "probe-injection dose as a multiple of the original feature count; reported as 1x/2x/5x/10x in prose"
 "p_full" = "feature count at that dose (original x (1+dose)); reported in prose to show the absolute budget was held fixed while p grew"
 "k_aggr" = "the absolute aggressive budget; reported in prose as k=3, 1 and 11 for cleveland, mammographic and spectf, held fixed across doses -- the control that makes Arm A interpretable"
-"kept_features" = "Arm B kept-set size. HELD OUT OF THE MANUSCRIPT, and the reason changed on 2026-08-16. The original objection -- that the aggressive budget was 25 percent of the kept set, so k rose 25 to 2500 down the ladder and confounded composition with the absolute retained count -- was fixed: the re-run holds k_aggr at 25 on every row, verified. But the re-run exposed a second and more serious problem in the design I approved: the kept set itself is chosen by ranking the FULL dataset including labels, once, outside the cross-validation (compute_p1_v2.py line 106). The optimistic bias that creates decreases monotonically as the kept set widens -- keep=100 is strongly label-optimised, keep=10000 is not selected at all -- so it pushes in exactly the direction measured. Diagnostic: the entire rise in the penalty comes from the reduced-25 model falling 0.905 to 0.821 while the full-kept model barely moves, which is the signature of a decreasing selection advantage and not what a pure distributed-signal account predicts. An in-fold re-selection re-run has been requested and pre-ruled three ways. Nothing from this arm is cited in the paper."
+"kept_features" = "Arm B kept-set size, final paired version. Three corrections, all recorded rather than tidied away: v1 confounded composition with the absolute retained count; v2 fixed the budget and exposed that the kept set itself was label-selected outside the cross-validation; v3 moved that selection in-fold; v4 additionally removed keep from the per-cell seed, so every rung sees identical folds and an identical base ranking and the rungs differ only in how deep that ranking is cut. Only v4 is cited. Because v4 is paired, the manuscript reports the WITHIN-unit adjacent differences (+0.010, +0.024, +0.017, +0.014, each excluding zero) and the end-to-end paired difference (+0.066), which the earlier unpaired versions could not support at all."
 "tag" = "provenance label for the cell (e.g. cleveland_dose5, arcene_keep1000); not a measured quantity"
 
 # --- P1 Arm A v2, with dispersion (results/enrichments/12_probe_injection_dose_response/), 2026-08-15.
@@ -148,6 +148,39 @@ columns = ["dataset", "method", "classifier", "budget", "calibrate", "rep"]
 "pred_unsafe" = "the diagnostic prediction (budget < kstar); its confusion matrix against the measured verdict is reported in prose as 59 percent agreement, sensitivity 1.00, specificity 0.15"
 "obs_spike" = "the measured verdict (AURC penalty >= +0.02, also locked in advance); the other half of the same confusion matrix"
 
+
+# --- P6 combined-confidence audit (results/enrichments/17_combined_confidence/), 2026-08-16.
+"aurc_A_full" = "AURC at the full budget under the probability-margin confidence; the paper reports the penalty, i.e. the aggressive-minus-full difference, not the levels"
+"aurc_A_aggr" = "AURC at the aggressive budget under the probability-margin confidence; same reason"
+"aurc_B_full" = "AURC at the full budget under the distance confidence; same reason"
+"aurc_B_aggr" = "AURC at the aggressive budget under the distance confidence; same reason"
+"aurc_C_full" = "AURC at the full budget under the pre-registered combined confidence; same reason"
+"aurc_C_aggr" = "AURC at the aggressive budget under the combined confidence; same reason"
+"selnb_A_full" = "selective net benefit at the full budget under the margin confidence; the pre-registration named it as a secondary axis and it is mixed, so the paper reports the AURC arm and declares this rather than selecting the favourable axis"
+"selnb_A_aggr" = "as selnb_A_full, at the aggressive budget"
+"selnb_C_full" = "selective net benefit under the combined confidence, full budget; same reason"
+"selnb_C_aggr" = "as selnb_C_full, at the aggressive budget"
+
+"penalty_A" = "the AURC reduction penalty under the probability-margin confidence; reported as +0.0335 with its interval"
+"penalty_B" = "the same penalty under the distance confidence; reported as +0.0116, and it reproduces the separately-run distance experiment to four decimals"
+"penalty_C" = "the same penalty under the pre-registered combined confidence; reported as +0.0173"
+"mitigation_pct_CvsA" = "the per-dataset percentage of the penalty removed by the combined confidence; the pooled figure (48%) and the fact that it is positive on all twelve datasets are reported, the per-dataset percentages are not, because on datasets whose baseline penalty is near zero the ratio is unstable and would read as a large effect where none exists"
+"aurc_aggr" = "AURC at the aggressive budget in the per-dataset mitigation table; the paper reports penalties rather than levels"
+
+"budget_k" = "the matched absolute budget at which the width association is evaluated; all four levels (1,2,4,8) are reported in prose"
+"spearman_rho" = "Spearman correlation between dataset width and harm at that matched budget; reported per budget"
+"boot_ci_lo" = "seeded bootstrap CI on the correlation; the paper quotes the p-value, and the intervals are wide at n=9-12 as one expects"
+"boot_ci_hi" = "as boot_ci_lo"
+"n_datasets" = "how many datasets qualify at that budget (a dataset enters only when p>k); reported in prose as twelve/twelve/eleven/nine"
+
+"p_value" = "significance of the width correlation at each matched budget; all four are reported in prose (0.31, 0.039, 0.020, 0.016)"
+
+"step" = "which pair of ladder rungs the paired difference compares; reported in prose as the four adjacent steps and the end-to-end difference"
+"paired_diff" = "within-unit mean difference in the reduction penalty between two rungs, available only because the rungs share folds; reported as +0.010, +0.024, +0.017, +0.014 and +0.066"
+"excludes_zero" = "whether that paired interval excludes zero; all five do, which the weaker marginal-overlap test cannot establish for the widest pair"
+"n_units" = "units contributing to the paired difference (180 = 3 rankers x 2 learners x 30 repetitions); all 180 carry all five rungs"
+
+"sd" = "within-cell standard deviation of the penalty in the smk harm curve; the manuscript reports the point estimate"
 
 [external_results]  # AUD-1 (Produced) -- committed result groups whose producing script is
                     # elsewhere in the repo. The declaration must NAME a script that IS committed;
@@ -175,8 +208,17 @@ columns = ["dataset", "method", "classifier", "budget", "calibrate", "rep"]
 "results/enrichments/11_recalibrator_flexibility_ladder" = "experiments/enrichments/compute_p2.py (cross-checked by _verify_p2.py)"
 "results/enrichments/13_safe_budget_diagnostic" = "experiments/enrichments/compute_p3_ASRUN.py"
 "results/enrichments/14_surviving_penalty_localisation" = "experiments/enrichments/compute_p4_ASRUN.py"
-"results/enrichments/15_matched_absolute_budget" = "experiments/enrichments/compute_p5_ASRUN.py"
+"results/enrichments/15_matched_absolute_budget" = "experiments/enrichments/compute_p5_ASRUN.py and compute_p5_across_budgets.py"
+"results/enrichments/17_combined_confidence" = "experiments/enrichments/compute_p6.py"
 "results/enrichments/00_environment_gate" = "no compute step: the environment gate is a test-suite and hash check, recorded in the execution playbook"
+
+"results/p1_final_from_nadia" = "experiments/enrichments/compute_p1_v2.py (Arm A) and experiments/enrichments/compute_p1b_v3.py (Arm B, in-fold kept-set selection)"
+
+"results/enrichments/12c_kept_set_composition_paired" = "experiments/enrichments/compute_p1b_v4_paired.py"
+
+"results/derived" = "experiments/enrichments/paired_ladder_steps.py"
+
+"results/enrichments/16_high_dimensional_fifth_dataset" = "experiments/run_highdim.py, launched by experiments/drivers/run_smk_shards.sh; concentration row by experiments/enrichments/compute_tier9.py"
 
 [not_run]  # V1 — scripts present but not exercised for this revision, declared with reasons.
 "experiments/make_graphical_abstract.py" = "graphical abstract not part of the SR revision package; not regenerated this round"

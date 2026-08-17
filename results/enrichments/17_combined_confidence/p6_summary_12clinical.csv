@@ -1,0 +1,4 @@
+arm,signal,aurc_full,aurc_aggr,aurc_penalty_mean,aurc_penalty_ci_lo,aurc_penalty_ci_hi,n_cells,selnb_penalty_mean,selnb_penalty_ci_lo,selnb_penalty_ci_hi
+A,prob_margin|p-0.5|,0.08259,0.11603,0.03345,0.03176,0.0351,2160,-0.0097,-0.01096,-0.0085
+B,-d_Xonly,0.15259,0.16422,0.01163,0.01031,0.01289,2160,,,
+C,combined_meanrank,0.10478,0.12207,0.01729,0.0163,0.01831,2160,-0.016314,-0.01761,-0.01503
