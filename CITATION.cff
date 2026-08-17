@@ -14,6 +14,8 @@ authors:
     affiliation: "Information Systems Department, Faculty of Computers and Information Sciences, Mansoura University, Mansoura, Egypt"
     email: "helghareeb@mans.edu.eg"
 repository-code: "https://github.com/helghareeb/certify-feature-reduction"
+doi: "10.5281/zenodo.21978878"
+version: "v1.0.0"
 license: MIT
 keywords:
   - feature selection

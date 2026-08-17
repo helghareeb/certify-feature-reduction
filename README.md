@@ -21,6 +21,9 @@
 
 **Under review at *Scientific Reports*.**
 
+Archived at Zenodo: [10.5281/zenodo.21978878](https://doi.org/10.5281/zenodo.21978878)
+(version-independent; resolves to the current release).
+
 This repository is public at a reviewer's request, so that every number in the manuscript can be
 checked against the code and the results that produced it. The manuscript itself is not distributed
 here; `paper/` holds only the generated figures and the table fragments it includes, so that a
