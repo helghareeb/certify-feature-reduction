@@ -54,13 +54,19 @@ jobs:
       - name: every committed result traces to committed code
         run: python scripts/provenance_map.py --check
       - name: per-folder manifests verify
+        # EVERY *.sha256, not just the file literally named MANIFEST.sha256. An arm carrying a
+        # second, sub-arm manifest (MANIFEST_4set.sha256) went unchecked under the old glob, and a
+        # release-time redaction left it stale without anything noticing.
         run: |
           fail=0
-          for d in results/enrichments/*/; do
-            if [ -f "$d/MANIFEST.sha256" ]; then
-              ( cd "$d" && sha256sum -c MANIFEST.sha256 >/dev/null ) || { echo "FAILED: $d"; fail=1; }
-            fi
-          done
+          found=0
+          while IFS= read -r m; do
+            found=$((found + 1))
+            d=$(dirname "$m"); b=$(basename "$m")
+            ( cd "$d" && sha256sum -c "$b" >/dev/null ) || { echo "FAILED: $m"; fail=1; }
+          done < <(find results -name '*.sha256' | sort)
+          echo "checked $found manifest(s)"
+          [ "$found" -gt 0 ] || { echo "no manifests found -- the glob is broken"; exit 1; }
           exit $fail
 
   reproduce:

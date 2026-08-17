@@ -52,7 +52,15 @@ so the number a reader is most likely to check cannot drift silently.
   be checked against an artifact rather than only read.
 - `RESULTS_*.md` — the report written when each experiment landed, including its pre-ruled outcomes.
 - `PRESPEC_*.md` — pre-registrations, committed before the corresponding numbers were computed.
-- `MANIFEST.sha256` — SHA-256 for every file in the folder.
+- `MANIFEST.sha256` — SHA-256 for every file in the folder. Every `*.sha256` here verifies against
+  the bytes released, and CI checks all of them on every push.
+
+  **One hash differs from the working repository's, deliberately.** Preparing this release redacted
+  two internal identifiers — a work-order number and a compute-node name — from
+  `02_high_dimensional_arm/RESULTS_tier2_4set.md`. The redaction changed that report's bytes, so its
+  entry in `MANIFEST_4set.sha256` describes the released file rather than the pre-redaction one. No
+  number, table or result in that file was touched, and every data file in the folder keeps the hash
+  it was produced under.
 - `calibration_*.json` — the configuration that produced the run, so the `calibration_sha256` stamped
   into each results file resolves to a file you can hash yourself.
 
