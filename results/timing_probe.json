@@ -1,0 +1,25 @@
+{
+  "n_full": 101763,
+  "p": 16,
+  "prevalence": 0.11160244882717688,
+  "train_rows": 81410,
+  "loader_s": 1.6,
+  "rankings_s": {
+    "mutual_info": 10.8,
+    "rf_importance": 11.9,
+    "l1_logistic": 0.3
+  },
+  "fit_s": {
+    "logistic_k16": 0.16,
+    "logistic_k4": 0.06,
+    "rf_k16": 23.49,
+    "rf_k4": 5.83,
+    "gb_k16": 5.16,
+    "gb_k4": 0.79
+  },
+  "calibrated_fit_s": {
+    "rf_isotonic": 50.42,
+    "rf_sigmoid": 59.97
+  },
+  "peak_rss_mb": 0.0
+}

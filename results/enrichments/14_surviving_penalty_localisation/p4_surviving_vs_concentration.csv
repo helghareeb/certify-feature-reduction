@@ -1,0 +1,13 @@
+dataset,penalty_d,gini_rf,retained_k,p
+bcw,0.0077,0.434,2.0,9
+cleveland,0.0253,0.288,3.0,12
+diabetes130,0.0022,0.446,4.0,16
+haberman,-0.0117,0.115,1.0,3
+heartfailure,0.0102,0.493,3.0,11
+hepatitis,0.0155,0.435,4.0,18
+ilpd,-0.0004,0.132,2.0,9
+mammographic,0.0285,0.282,1.0,5
+pima,0.0261,0.231,2.0,8
+spectf,-0.0017,0.245,11.0,44
+statlogheart,0.028,0.294,3.0,12
+wdbc,0.01,0.611,8.0,30

@@ -1,0 +1,80 @@
+{
+  "RANDOM_SEED": 20260626,
+  "REPS": 30,
+  "bootstrap_alpha": 0.05,
+  "bootstrap_resamples": 5000,
+  "budgets": {
+    "fracs": [
+      1.0,
+      0.25
+    ],
+    "ks": []
+  },
+  "calibrations": [
+    "none",
+    "beta",
+    "temperature"
+  ],
+  "classifiers": [
+    "logistic",
+    "rf",
+    "gb"
+  ],
+  "dataset_params": {
+    "diabetes130": {
+      "n_target": null,
+      "stratify": "outcome_race",
+      "subsample_seed": 20260626
+    }
+  },
+  "datasets": [
+    "cleveland",
+    "pima",
+    "ilpd",
+    "heartfailure",
+    "wdbc",
+    "statlogheart",
+    "haberman",
+    "hepatitis",
+    "mammographic",
+    "bcw",
+    "spectf",
+    "diabetes130"
+  ],
+  "metric_params": {
+    "nb_curve_grid": {
+      "n": 50,
+      "t_hi": 0.5,
+      "t_lo": 0.01
+    },
+    "net_benefit": {
+      "n_thresholds": 19,
+      "t_hi": 0.5,
+      "t_lo": 0.05
+    }
+  },
+  "n_folds": 5,
+  "note": "TIER3: third recalibrator (beta calibration + temperature scaling) on the recal reduced grid (fracs [1.0,0.25], 3 rankers, 3 learners). Cloned byte-identical from calibration_recal_allrankers except calibrations. beta/temperature computed by tier3_run.py's cv=3 ensemble, VALIDATED to reproduce CalibratedClassifierCV sigmoid to 2e-16 (frozen run.py untouched). none reproduces the cached frozen path (gate). Compare ECE-recovery vs AURC/net-benefit dissociation. Separate artifact (R6).",
+  "outcomes": [
+    "accuracy",
+    "auroc",
+    "brier",
+    "ece",
+    "aurc",
+    "auroc_gap",
+    "ece_gap",
+    "net_benefit",
+    "net_benefit_gap",
+    "conformal_efficiency",
+    "conformal_coverage_gap",
+    "selective_ece"
+  ],
+  "reduction_methods": [
+    "mutual_info",
+    "rf_importance",
+    "l1_logistic"
+  ],
+  "reference_frac": 1.0,
+  "schema_version": "2.0.0",
+  "stat_alpha": 0.05
+}

@@ -1,0 +1,240 @@
+# paper/MANIFEST.toml — the audit manifest (AUDIT_RULES.md, AUD-1..4).
+# Every substantive claim in the manuscript resolves to the code that earns it; every control
+# is a column that demonstrably varies; every unexercised script is declared, not silent.
+# Checked by the pre-submission audit gate. Revision v2 (SR submission <submission reference withheld>).
+
+[claims]  # AUD-3 / V3 — claim -> file:line that implements it. Adjectives are claims.
+"the budget rule k = max(1, round(frac*p)), with its >=1 floor and round-half-to-even, exactly as disclosed in Methods" = "src/nsclinfs/reduction.py:48"
+"paired design: the per-cell seed excludes the budget and the calibration mode, so every budget shares the CV split within a repetition" = "src/nsclinfs/seeds.py:23"
+"leakage firewall: imputation, ranking, standardisation and fitting all inside the training fold" = "src/nsclinfs/run.py:73"
+"exact-k budgets evaluated inside the same repetitions/folds as the fractional arm (shared rankings, dedupe of equal k)" = "src/nsclinfs/run.py:57"
+"Holm multiplicity families computed WITHIN budget_type, so the exact-k arm cannot move the fractional-family corrections" = "experiments/run_clinical_fs.py:76"
+"selective reliability: AURC with confidence |p - 0.5|" = "src/nsclinfs/metrics.py:69"
+"decision-curve net benefit NB(t) = TP/n - FP/n * t/(1-t), averaged over t in [0.05, 0.5]" = "src/nsclinfs/metrics.py:90"
+"split-conformal prediction sets at 90% nominal coverage; set size is the reported axis" = "src/nsclinfs/metrics.py:111"
+"selective calibration: ECE on the 80% most-confident subset" = "src/nsclinfs/metrics.py:141"
+"subgroup gaps: between-group range with the >=10-samples-and-both-classes guard" = "src/nsclinfs/fairness.py:33"
+"net-benefit parity gap across protected groups" = "src/nsclinfs/fairness.py:41"
+"materiality: two-sided paired Wilcoxon, Holm-corrected, AND a 5000-resample bootstrap CI excluding zero" = "src/nsclinfs/stats.py:17"
+"the analysis refuses to combine results carrying different calibration hashes (R6). Enforced by assert_single_hash at every path that reads a summary for a manuscript number -- nine consumers, verified by call-site audit 2026-08-15. Two deliberate exclusions: launch_grid.py counts rows for resume logic and never analyses them, and v1_v2_diff.py exists precisely to compare the archived v1 aggregates against the rebuild ACROSS configurations, so the guard would defeat its purpose; its output is quoted only in the response letter, never in the manuscript." = "src/nsclinfs/hashing.py:38"
+"leakage-safe recalibration: Platt/isotonic fitted by inner 3-fold CV within each training fold" = "src/nsclinfs/run.py:52"
+"the full Diabetes-130 cohort (config-driven; n_target null = all 101,763 post-filter encounters; joint outcome-race stratification when subsampling)" = "src/nsclinfs/data.py:146"
+"the worked example's cell and threshold were fixed a priori in a committed configuration" = "config/analysis.json:1"
+"per-patient decision flips: (p_full >= t) != (p_reduced >= t), aggregated over the 30 paired repetitions" = "experiments/worked_example.py:51"
+"selection stability: mean pairwise Jaccard of top-k sets over all 150 per-fold rankings per dataset and ranker" = "experiments/ranking_stability.py:56"
+"the strict safety certificate: no materially-worse cell on any reliability axis at a budget" = "experiments/safe_budget.py:1"
+"subsample agreement: full-cohort vs n=6000 deltas with CI-overlap, sign and verdict agreement" = "experiments/subsample_agreement.py:1"
+"cross-dataset screen with leave-one-dataset-out and seeded 5000-resample bootstrap robustness" = "experiments/meta_analysis_k.py:1"
+"one canonical aggregator: every table and figure derives from the committed summaries (R2)" = "experiments/run_clinical_fs.py:31"
+"dataset descriptors (redundancy, intrinsic dimension) computed from the same loaders under the same dataset_params as the grid" = "experiments/meta_analysis.py:31"
+
+[controls]  # AUD-4 / V4 — columns that MUST vary in the released summaries.
+columns = ["dataset", "method", "classifier", "budget", "calibrate", "rep"]
+
+[out_of_scope]  # AUD-2 / V2 — summary columns not cited by literal name in the .tex, each with
+                # the reason. Metric values reach the prose through regenerated \result{} numbers
+                # and table fragments, not by column name.
+"auroc_gap" = "reported throughout as 'AUROC subgroup gap' in prose and the new-axes/headline tables"
+"ece_gap" = "reported as 'ECE gap / calibration-fairness gap' in prose and tables"
+"net_benefit_gap" = "reported as 'net-benefit parity gap' in prose and tables"
+"conformal_coverage" = "held at nominal 90% by construction (manuscript states set size, not coverage, is the informative axis); reported in the new-axes table"
+"conformal_coverage_gap" = "reported as 'group-conditional conformal coverage gap' in prose"
+"conformal_efficiency" = "reported as 'conformal set size' in prose and tables"
+"calibrate" = "experimental arm label (none/sigmoid/isotonic); reported as 'raw / Platt / isotonic' in the recalibration section"
+"budget_type" = "provenance column distinguishing the fractional from the exact-k arm; the arms are described in Methods"
+"budget" = "canonical budget label (frac:x / k:n); budgets are reported as fractions and k values in prose"
+
+# --- Columns from the ECE bin-count sensitivity control (results/enrichments/01_ece_bin_sensitivity/*.csv),
+#     added 2026-08-13. That control is a SEPARATE grid under its own configuration hash; it is
+#     never merged with the submitted results (R6). Its findings reach the prose through
+#     Section "Limitations and threats to validity", not by column name.
+"bin_type" = "binning scheme label (equal_width / equal_frequency); reported in Threats as 'equal-width and equal-frequency binning', not as a numeric result"
+"bins" = "bin count of the sensitivity sweep; the six values are named individually in Threats"
+"mean_penalty" = "the ECE/AURC reduction penalty of the sensitivity control; specific values are quoted in Threats via regenerated numbers, and the sweep's conclusion is reported there in full"
+"frac_positive" = "diagnostic only: the share of units with a positive penalty within a sweep cell. Not quoted anywhere; the reported materiality test is the Holm-corrected one, and this column is the weaker descriptive companion to it"
+"p_ttest" = "diagnostic only: the parametric p, retained in the artifact for comparison. The manuscript reports the Holm-corrected p (p_holm) and the paired Wilcoxon; the t-test p is anticonservative on these block-structured units and is deliberately NOT the reported test"
+"p_wilcoxon" = "the uncorrected paired Wilcoxon p. The manuscript reports the Holm-corrected value (p_holm); the uncorrected column is kept so the correction is auditable rather than asserted"
+"mean_aurc_full" = "component AURC at the full-feature reference of the confidence-parameterisation check; the manuscript reports the penalty (reduced minus full), not its components"
+"mean_aurc_red" = "component AURC at the reduced budget of the same check; as above, only the difference is reported"
+"frac" = "the fractional budget; reported as percentages throughout"
+"k_features" = "the realised retained count; reported as k throughout Section 4.7"
+"n_features" = "the dataset feature count; reported as p in Table 1 and prose"
+"mean" = "per-budget outcome mean; reported via table fragments"
+"n" = "cohort size, used as a candidate predictor in the cross-dataset correlate analysis. KNOWN STALE LABEL, verified harmless 2026-08-16: in tier8_correlates_clinical.csv the diabetes130 row carries n=6000 from the superseded subsample arm while its harm values (+0.0306, +0.00813) are the full-cohort ones. Checked rather than assumed -- Spearman uses ranks, and diabetes130 is the largest cohort under either value, so every reported correlation is identical both ways (+0.0490 and +0.2238). No number moves. The label is nonetheless misleading in a released file and a corrected re-ship has been requested; the file is not edited here because it sits inside an author-signed manifest."
+"delta" = "the paired difference -- the paper's primary estimand, reported in every results table"
+"ci_lo" = "lower bootstrap CI bound; CIs are reported in aggregate as 'bootstrap CI excludes zero'"
+"ci_hi" = "upper bootstrap CI bound; as above"
+"diff_ci_lo" = "paired-difference CI lower bound; consumed by the materiality rule"
+"diff_ci_hi" = "paired-difference CI upper bound; consumed by the materiality rule"
+"p_raw" = "uncorrected Wilcoxon p; only Holm-corrected values are quoted (Methods)"
+"p_holm" = "Holm-corrected p; consumed by the materiality rule, quoted as 'Holm-corrected p<0.05'"
+"cohens_d" = "paired effect size, computed and released but not quoted; materiality uses the CI+Holm rule"
+"material" = "two-sided materiality flag; the direction-resolved splits are what the paper reports"
+"material_worse" = "reported everywhere as the 'materially worse' cell counts"
+"material_better" = "reported everywhere as the 'materially better' cell counts"
+"outcome" = "long-format outcome name column; outcomes are enumerated in Methods"
+"seed" = "per-cell derived seed (R5 provenance)"
+"runtime_s" = "per-row runtime provenance; summarised in the execution playbook"
+"calib_sha256" = "R6 provenance column: the calibration hash embedded in every row"
+"accuracy" = "computed and released; not a headline axis (threshold-dependent and dominated by prevalence), listed in Methods outcomes"
+"auroc" = "reported throughout as AUROC via tables and \\result numbers"
+"ece" = "reported throughout as ECE"
+"brier" = "reported throughout as the Brier score"
+"aurc" = "reported throughout as AURC"
+"net_benefit" = "reported throughout as decision-curve net benefit"
+"selective_ece" = "reported as 'selective calibration' in Section 4.6"
+"dataset" = "grouping column; datasets are named in Table 1"
+"method" = "ranker label; named in Methods"
+"classifier" = "learner label; named in Methods"
+"rep" = "repetition index (R4)"
+
+# --- Columns from the second enrichment round (Tiers 2-9, E2, P2), added 2026-08-15.
+#     Each is either reported in the prose/tables under a readable name, or genuinely not
+#     reported and declared with the reason. Nothing here contradicts the manuscript except
+#     `gini`, which did -- see its entry.
+"ece_recovery" = "the flexibility-ladder table reports it as 'ECE recovery' (five rungs); the column reaches the paper through the table fragment, not by name"
+"aurc_recovery" = "reported as 'AURC recovery' in the flexibility-ladder table and discussed in the recalibration section"
+"net_benefit_recovery" = "reported as 'net-benefit recovery' in the flexibility-ladder table; the text states its magnitude (0.9% of baseline) and that it is monotone in flexibility"
+"rho_indep" = "reported in the Limitations section as the Spearman correlation between the distance-based confidence and |p-0.5|, pooled (0.40) and as the unweighted per-dataset mean (0.27)"
+"penalty_margin" = "the AURC reduction penalty under the probability-scale confidence; reported as +0.0334 in the Limitations section"
+"penalty_d" = "the AURC reduction penalty under the probability-independent distance confidence; reported as +0.0116 in the Limitations section"
+"harm_auroc" = "the per-dataset AUROC reduction penalty used as the outcome in the cross-dataset correlate analysis; reported in prose as the harm correlated against n, p and retained-k"
+"harm_aurc" = "the per-dataset AURC reduction penalty, same analysis; its correlation with retained-k (-0.78) is reported in the text"
+"retained_k_aggr" = "the number of features retained at the aggressive budget; reported in prose as 'retained-k', whose partial correlation with the harm is that subsection's headline"
+"auroc_delta" = "the AUROC reduction penalty in the high-dimensional four-set arm; the k=1 values for all four datasets are reported individually in the high-dimensional section"
+"auroc_delta_k1" = "the same penalty at k=1 in the n-vs-p disentangling arm; reported in the high-dimensional section as the arrhythmia subsampling result"
+"auroc_delta_k8" = "the same penalty at k=8; reported qualitatively (prostate is neutral-to-beneficial beyond k=8). Not tabulated per dataset: the arm is exploratory and the paper's quantitative claim is scoped to k=1"
+"mworse" = "count of materially worse cells in the high-dimensional partial arm; the manuscript reports materiality counts for the twelve clinical datasets and describes the high-dimensional arm qualitatively, since with four datasets a count is not informative"
+"mbetter" = "count of materially better cells, same arm and same reason"
+"top1_share" = "concentration of ranker score mass in the top 1 feature; not reported -- the paper quotes the budgets it actually tested against (top-8 and top-64), and nine nested shares would add length without information"
+"top2_share" = "as top1_share; not reported"
+"top4_share" = "as top1_share; not reported"
+"top8_share" = "reported: 66% for prostate against 15% for arcene under L1-logistic, in the high-dimensional section"
+"top16_share" = "as top1_share; not reported"
+"top32_share" = "as top1_share; not reported"
+"top64_share" = "reported: 38% for prostate against 14% for arcene under random-forest importance, and 6.1% against 2.8% under mutual information"
+"top128_share" = "as top1_share; not reported"
+"top256_share" = "as top1_share; not reported"
+"gini" = "scale-free concentration (Gini) of the ranker scores. CONTRADICTION, reconciled 2026-08-15 rather than left uncited: an earlier draft claimed the four high-dimensional datasets are ordered from least to most harmed by concentration. Gini ranks arcene ABOVE arrhythmia under all three rankers while arcene is the more harmed of the two, so it refutes that ordering. The section now claims only the prostate-vs-arcene contrast (robust 9/9 across three rankers and three statistics), states the Gini disagreement explicitly, and reports Gini 0.83 for arcene beside its 15% top-8 share to show why a scale-free index and an in-budget share diverge at p=10,000. Glioma has no Tier 9 measurement at all and is excluded rather than assumed to fit; it has been requested."
+
+# --- P1 probe-injection dose-response (results/enrichments/12_probe_injection_dose_response/), added 2026-08-15.
+"auroc_full" = "the full-feature model AUROC at each probe dose / kept-set size; reported in prose as the reason the penalty closes -- the full model degrades under noise padding while the reduced model does not"
+"auroc_red" = "the reduced-model AUROC at the same cell; same paragraph, same reason"
+"auroc_penalty" = "the AUROC reduction penalty; the dose-response values are reported per dataset in the high-dimensional section (cleveland +0.054 to +0.006, spectf +0.004 to -0.037, mammographic +0.086 to +0.081)"
+"aurc_penalty" = "the AURC reduction penalty on the same grid; the paper reports the AUROC arm and does not separately tabulate AURC here, since the dose-response claim is about discrimination-side harm"
+"dose" = "probe-injection dose as a multiple of the original feature count; reported as 1x/2x/5x/10x in prose"
+"p_full" = "feature count at that dose (original x (1+dose)); reported in prose to show the absolute budget was held fixed while p grew"
+"k_aggr" = "the absolute aggressive budget; reported in prose as k=3, 1 and 11 for cleveland, mammographic and spectf, held fixed across doses -- the control that makes Arm A interpretable"
+"kept_features" = "Arm B kept-set size, final paired version. Three corrections, all recorded rather than tidied away: v1 confounded composition with the absolute retained count; v2 fixed the budget and exposed that the kept set itself was label-selected outside the cross-validation; v3 moved that selection in-fold; v4 additionally removed keep from the per-cell seed, so every rung sees identical folds and an identical base ranking and the rungs differ only in how deep that ranking is cut. Only v4 is cited. Because v4 is paired, the manuscript reports the WITHIN-unit adjacent differences (+0.010, +0.024, +0.017, +0.014, each excluding zero) and the end-to-end paired difference (+0.066), which the earlier unpaired versions could not support at all."
+"tag" = "provenance label for the cell (e.g. cleveland_dose5, arcene_keep1000); not a measured quantity"
+
+# --- P1 Arm A v2, with dispersion (results/enrichments/12_probe_injection_dose_response/), 2026-08-15.
+"auroc_penalty_mean" = "the cell mean AUROC reduction penalty; the dose-response values are reported per dataset in the high-dimensional section"
+"auroc_penalty_sd" = "within-cell standard deviation over the 180 units; the manuscript reports the bootstrap interval rather than the sd"
+"aurc_full" = "full-model AURC at that dose; the AUROC arm is what the dose-response claim rests on, and the AURC arm is not separately tabulated"
+"aurc_red" = "reduced-model AURC at that dose; same reason"
+
+# --- E3 cross-axis coherence, P4 localisation null, P5 matched-absolute-budget (2026-08-16).
+"harm_auroc_k8" = "AUROC reduction penalty at a matched absolute budget of k=8; reported in the retained-count section as the correlation with p over the nine clinical datasets for which k=8 is genuinely a reduction"
+"block" = "provenance label separating the clinical panel from the exploratory high-dimensional arm. The manuscript reports the clinical figure ONLY and never pools the two; this column exists so that separation is checkable rather than asserted. The pooled correlation over all 13 datasets (rho=+0.598) is deliberately NOT reported, because pooling the arms is precisely what the high-dimensional section says it never does."
+
+"conformal_setsize" = "conformal set size in the cross-axis matrix. The first delivery named it conformal_eff and was the only axis not harm-oriented, so its four correlations carried the wrong SIGN -- reading as disagreement what is in fact strong agreement. Recomputed here from summary.csv with every axis oriented positive-is-worse: all ten magnitudes reproduce and the four conformal signs flip. The corrected artifact was re-delivered and matches. The manuscript reports +0.89 with selective reliability."
+"selective_ECE" = "selective calibration error in the cross-axis matrix; its +0.97 correlation with ECE is reported as the sanity check that the matrix measures what it claims"
+"retained_k" = "retained count at the aggressive budget, reused as a predictor in the localisation null; reported in prose as retained-k"
+"gini_rf" = "concentration index reused from the Tier 9 artifact as a predictor in the localisation null; the index itself is declared under gini above"
+
+# --- P3 pre-registered concentration-curve safe-budget diagnostic (2026-08-16).
+"kstar" = "the saturation budget: smallest k at which the top-k score share reaches 90 percent; the threshold was locked in PRESPEC_p3.md before the diagnostic was computed, and is reported in prose"
+"pred_unsafe" = "the diagnostic prediction (budget < kstar); its confusion matrix against the measured verdict is reported in prose as 59 percent agreement, sensitivity 1.00, specificity 0.15"
+"obs_spike" = "the measured verdict (AURC penalty >= +0.02, also locked in advance); the other half of the same confusion matrix"
+
+
+# --- P6 combined-confidence audit (results/enrichments/17_combined_confidence/), 2026-08-16.
+"aurc_A_full" = "AURC at the full budget under the probability-margin confidence; the paper reports the penalty, i.e. the aggressive-minus-full difference, not the levels"
+"aurc_A_aggr" = "AURC at the aggressive budget under the probability-margin confidence; same reason"
+"aurc_B_full" = "AURC at the full budget under the distance confidence; same reason"
+"aurc_B_aggr" = "AURC at the aggressive budget under the distance confidence; same reason"
+"aurc_C_full" = "AURC at the full budget under the pre-registered combined confidence; same reason"
+"aurc_C_aggr" = "AURC at the aggressive budget under the combined confidence; same reason"
+"selnb_A_full" = "selective net benefit at the full budget under the margin confidence; the pre-registration named it as a secondary axis and it is mixed, so the paper reports the AURC arm and declares this rather than selecting the favourable axis"
+"selnb_A_aggr" = "as selnb_A_full, at the aggressive budget"
+"selnb_C_full" = "selective net benefit under the combined confidence, full budget; same reason"
+"selnb_C_aggr" = "as selnb_C_full, at the aggressive budget"
+
+"penalty_A" = "the AURC reduction penalty under the probability-margin confidence; reported as +0.0335 with its interval"
+"penalty_B" = "the same penalty under the distance confidence; reported as +0.0116, and it reproduces the separately-run distance experiment to four decimals"
+"penalty_C" = "the same penalty under the pre-registered combined confidence; reported as +0.0173"
+"mitigation_pct_CvsA" = "the per-dataset percentage of the penalty removed by the combined confidence; the pooled figure (48%) and the fact that it is positive on all twelve datasets are reported, the per-dataset percentages are not, because on datasets whose baseline penalty is near zero the ratio is unstable and would read as a large effect where none exists"
+"aurc_aggr" = "AURC at the aggressive budget in the per-dataset mitigation table; the paper reports penalties rather than levels"
+
+"budget_k" = "the matched absolute budget at which the width association is evaluated; all four levels (1,2,4,8) are reported in prose"
+"spearman_rho" = "Spearman correlation between dataset width and harm at that matched budget; reported per budget"
+"boot_ci_lo" = "seeded bootstrap CI on the correlation; the paper quotes the p-value, and the intervals are wide at n=9-12 as one expects"
+"boot_ci_hi" = "as boot_ci_lo"
+"n_datasets" = "how many datasets qualify at that budget (a dataset enters only when p>k); reported in prose as twelve/twelve/eleven/nine"
+
+"p_value" = "significance of the width correlation at each matched budget; all four are reported in prose (0.31, 0.039, 0.020, 0.016)"
+
+"step" = "which pair of ladder rungs the paired difference compares; reported in prose as the four adjacent steps and the end-to-end difference"
+"paired_diff" = "within-unit mean difference in the reduction penalty between two rungs, available only because the rungs share folds; reported as +0.010, +0.024, +0.017, +0.014 and +0.066"
+"excludes_zero" = "whether that paired interval excludes zero; all five do, which the weaker marginal-overlap test cannot establish for the widest pair"
+"n_units" = "units contributing to the paired difference (180 = 3 rankers x 2 learners x 30 repetitions); all 180 carry all five rungs"
+
+"sd" = "within-cell standard deviation of the penalty in the smk harm curve; the manuscript reports the point estimate"
+
+[external_results]  # AUD-1 (Produced) -- committed result groups whose producing script is
+                    # elsewhere in the repo. The declaration must NAME a script that IS committed;
+                    # naming an absent one still FAILS, by design.
+"results/submitted-v1" = "the frozen v1 aggregates, produced by run_clinical_fs.py under config/submitted-v1/; never regenerated (N4)"
+"results/spotcheck_v1" = "single-cell spot check of the v1 pipeline, produced by run_clinical_fs.py"
+"results/spotcheck_v2" = "single-cell spot check of the rebuilt pipeline, produced by run_clinical_fs.py"
+
+# The enrichment code arrived 2026-08-16 and is committed under experiments/enrichments/,
+# together with the frozen library copy it ran against. Every script was read against the
+# three leakage questions before this declaration was written; see AUDIT_REPORT.md.
+
+"results/enrichments/01_ece_bin_sensitivity" = "experiments/enrichments/compute_tier1.py + compute_tier1_materiality.py"
+"results/enrichments/02_high_dimensional_arm" = "experiments/run_highdim.py (registers src/nsclinfs/highdim_data.py onto data.LOADERS, then delegates to the frozen run_clinical_fs.main(), so this arm carries no evaluation logic of its own); launched by experiments/drivers/run_highdim_grid.sh"
+"results/enrichments/03_recalibrators_beta_temperature" = "experiments/enrichments/tier3_run.py"
+"results/enrichments/04_ensemble_disagreement_confidence" = "experiments/enrichments/tier4_disagreement.py"
+"results/enrichments/05_gradient_boosting_bin_sweep" = "experiments/enrichments/compute_tier5.py + compute_tier5_materiality.py"
+"results/enrichments/06_distance_to_support_confidence" = "experiments/enrichments/tier6_distance.py"
+"results/enrichments/07_sample_size_vs_width" = "experiments/enrichments/compute_tier7.py"
+"results/enrichments/08_cross_dataset_correlates" = "experiments/enrichments/compute_tier8.py"
+"results/enrichments/09_signal_concentration" = "experiments/enrichments/compute_tier9.py"
+"results/enrichments/09_signal_concentration_16ds" = "experiments/enrichments/compute_tier9.py"
+"results/enrichments/10_independence_vs_sample_size" = "experiments/enrichments/compute_e2.py"
+"results/enrichments/10b_cross_axis_coherence" = "experiments/enrichments/compute_e3_ASRUN.py"
+"results/enrichments/11_recalibrator_flexibility_ladder" = "experiments/enrichments/compute_p2.py (cross-checked by _verify_p2.py)"
+"results/enrichments/13_safe_budget_diagnostic" = "experiments/enrichments/compute_p3_ASRUN.py"
+"results/enrichments/14_surviving_penalty_localisation" = "experiments/enrichments/compute_p4_ASRUN.py"
+"results/enrichments/15_matched_absolute_budget" = "experiments/enrichments/compute_p5_ASRUN.py and compute_p5_across_budgets.py"
+"results/enrichments/17_combined_confidence" = "experiments/enrichments/compute_p6.py"
+"results/enrichments/00_environment_gate" = "no compute step: the environment gate is a test-suite and hash check, recorded in the execution playbook"
+
+"results/enrichments/12_probe_injection_dose_response" = "experiments/enrichments/compute_p1_v2.py (Arm A) and experiments/enrichments/compute_p1b_v3.py (Arm B, in-fold kept-set selection)"
+
+"results/enrichments/12c_kept_set_composition_paired" = "experiments/enrichments/compute_p1b_v4_paired.py"
+
+"results/derived" = "experiments/enrichments/paired_ladder_steps.py"
+
+"results/enrichments/16_high_dimensional_fifth_dataset" = "experiments/run_highdim.py, launched by experiments/drivers/run_smk_shards.sh; concentration row by experiments/enrichments/compute_tier9.py"
+
+
+# Out-of-fold caches, committed for the public release. Large (~95 MB of parquet) and
+# normally excluded under the lean-repo policy, but the worked clinical examples -- the
+# per-patient decision flips, the reliability diagrams and the per-threshold net-benefit
+# curves -- read these and nothing else, so without them the headline "one biopsy decision
+# in five" cannot be regenerated from a clone.
+"results/cache/poof" = "src/nsclinfs/run.py (_write_poof), driven by experiments/run_clinical_fs.py"
+"results/cache/rankings" = "experiments/ranking_stability.py"
+"results/cache" = "src/nsclinfs/run.py (per-threshold net-benefit curves), driven by experiments/run_clinical_fs.py"
+[not_run]  # V1 — scripts present but not exercised for this revision, declared with reasons.
+"experiments/make_graphical_abstract.py" = "graphical abstract not part of the SR revision package; not regenerated this round"
+"experiments/probe_timing.py" = "diagnostic only: measured atomic fit/ranking times to size the grid before launch (results/timing_probe.json); produces no manuscript number"
+"experiments/fetch_data.py" = "exercised once to fetch and pin the raw datasets (data/MANIFEST.json); produces no manuscript number"
+"experiments/launch_grid.py" = "orchestration only: runs run_clinical_fs.py shards; produces no numbers itself"
+"experiments/merge_shards.py" = "orchestration only: merges shards, enforces hash/row-count, calls the canonical aggregator"
+"experiments/run_burn.cmd" = "Task Scheduler wrapper for the grid chain; no numbers"
+"experiments/run_recal_allrankers.cmd" = "Task Scheduler wrapper for the all-rankers recalibration control; orchestration only, no numbers of its own. The run it wrapped COMPLETED 2026-08-13 04:42 (87/87 shards, 0 failures); Section 4.8 and Table 4 now derive from its output, config/calibration_recal_allrankers.json -> results/summary_recalibration_allrankers.csv (committed). Its earlier IN-FLIGHT declaration was retired in the same commit as the Section 4.8 rewrite, so this entry never outlived its truth."
+"experiments/v1_v2_diff.py" = "internal invariance check of the rebuild against the archived v1 aggregates (results/v1_v2_diff.json); quoted only in the response letter"

@@ -1,0 +1,62 @@
+{
+  "grid": "matched all-ranker (12 datasets x 3 rankers x 3 learners = 108 cells/rung, full budget)",
+  "none_baseline_agreement": "0.00e+00 across ece/aurc/net_benefit (identical, licenses the R6 merge)",
+  "spearman_flexibility_vs_ece_recovery": 1.0,
+  "spearman_flexibility_vs_aurc_recovery": -0.9,
+  "mean_abs_aurc_recovery": 0.001,
+  "ladder": [
+    {
+      "calibrate": "none",
+      "flexibility": 0,
+      "ece": 0.0694,
+      "ece_recovery": 0.0,
+      "aurc": 0.084,
+      "aurc_recovery": 0.0,
+      "net_benefit_recovery": 0.0,
+      "cells": 108
+    },
+    {
+      "calibrate": "temperature",
+      "flexibility": 1,
+      "ece": 0.064,
+      "ece_recovery": 0.0054,
+      "aurc": 0.0814,
+      "aurc_recovery": 0.0026,
+      "net_benefit_recovery": 0.0001,
+      "cells": 108
+    },
+    {
+      "calibrate": "sigmoid",
+      "flexibility": 2,
+      "ece": 0.0542,
+      "ece_recovery": 0.0152,
+      "aurc": 0.0844,
+      "aurc_recovery": -0.0004,
+      "net_benefit_recovery": 0.0021,
+      "cells": 108
+    },
+    {
+      "calibrate": "beta",
+      "flexibility": 3,
+      "ece": 0.0504,
+      "ece_recovery": 0.0191,
+      "aurc": 0.0845,
+      "aurc_recovery": -0.0005,
+      "net_benefit_recovery": 0.0024,
+      "cells": 108
+    },
+    {
+      "calibrate": "isotonic",
+      "flexibility": 99,
+      "ece": 0.0501,
+      "ece_recovery": 0.0193,
+      "aurc": 0.0853,
+      "aurc_recovery": -0.0013,
+      "net_benefit_recovery": 0.0028,
+      "cells": 108
+    }
+  ],
+  "verdict": "ECE recovery strictly monotone with flexibility; AURC/net-benefit recovery flat ~0 -> not a flexibility limitation (airtight)",
+  "correction_note": "supersedes the mixed-grid v1 (none/sig/iso were mutual_info-only 36 cells vs tier3 all-ranker 108); rebuilt on matched all-ranker grid",
+  "cells_per_rung": 108
+}

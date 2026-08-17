@@ -1,0 +1,67 @@
+{
+  "schema_version": "2.0.0",
+  "note": "v2 (SR revision, 2026-08): full Diabetes-130 cohort; exact-k budget arm beside the fractional arm (Holm families are computed per budget_type, so the frac-arm statistics are structurally identical to v1); net-benefit threshold range moved here unchanged from the v1 hardcoded values; per-threshold NB curves + configured p_oof cells persisted. v1 configs archived under config/submitted-v1/ (hash 1d05f19c...).",
+  "RANDOM_SEED": 20260626,
+  "REPS": 30,
+  "datasets": [
+    "cleveland"
+  ],
+  "dataset_params": {
+    "diabetes130": {
+      "n_target": null,
+      "subsample_seed": 20260626,
+      "stratify": "outcome_race"
+    }
+  },
+  "reduction_methods": [
+    "mutual_info",
+    "rf_importance",
+    "l1_logistic"
+  ],
+  "classifiers": [
+    "logistic",
+    "rf",
+    "gb"
+  ],
+  "budgets": {
+    "fracs": [
+      1.0,
+      0.75,
+      0.5,
+      0.33,
+      0.25
+    ],
+    "ks": []
+  },
+  "reference_frac": 1.0,
+  "n_folds": 5,
+  "outcomes": [
+    "accuracy",
+    "auroc",
+    "brier",
+    "ece",
+    "aurc",
+    "auroc_gap",
+    "ece_gap",
+    "net_benefit",
+    "net_benefit_gap",
+    "conformal_efficiency",
+    "conformal_coverage_gap",
+    "selective_ece"
+  ],
+  "metric_params": {
+    "net_benefit": {
+      "t_lo": 0.05,
+      "t_hi": 0.5,
+      "n_thresholds": 19
+    },
+    "nb_curve_grid": {
+      "t_lo": 0.01,
+      "t_hi": 0.5,
+      "n": 50
+    }
+  },
+  "bootstrap_resamples": 5000,
+  "bootstrap_alpha": 0.05,
+  "stat_alpha": 0.05
+}

@@ -1,0 +1,63 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.ipynb_checkpoints/
+
+# --- OS / editor cruft ---
+.DS_Store
+
+# --- Logs & transient output ---
+*.log
+logs/
+*.out
+
+# --- LaTeX build litter ---
+# This repository does not carry the manuscript. paper/ holds only the generated figures
+# and the table fragments the manuscript \input{}s, so that a reader can compare a
+# rebuild against the numbers as typeset. Anything else LaTeX leaves behind is litter.
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.spl
+paper/*.toc
+paper/*.fls
+paper/*.fdb_latexmk
+paper/*.synctex.gz
+paper/*.log
+paper/*.out
+paper/*.pdf
+!paper/figures/*.pdf
+
+# --- Lean-repo: large generated data & raw results ---
+# Policy: never commit large generated data or raw per-trial results.
+# Commit the generators/loaders and the canonical summary CSVs only;
+# reproducibility is preserved via download links in Data Availability.
+data/**/raw/
+datasets/
+results/raw/
+*.parquet
+*.npz
+*.h5
+*.ckpt
+*.pt
+*.zip
+
+# --- Keep canonical summary CSVs ---
+# Un-ignore the single canonical aggregator output(s) so they ARE versioned,
+# even though raw results above are not. These are the small, paper-grade
+# tables every figure/number derives from.
+!results/*summary*.csv
+
+# --- Keep the out-of-fold caches, deliberately, despite the lean-repo policy ---
+# results/cache/ is ~95 MB of parquet and would normally be excluded here. It is
+# committed because the worked clinical examples -- the per-patient decision flips, the
+# reliability diagrams, the per-threshold net-benefit curves -- are computed from these
+# caches and from nothing else. Excluding them would mean the paper's headline
+# "one biopsy decision in five" could not be regenerated from a clone, which is exactly
+# the verification a reader is entitled to run.
+!results/cache/
+!results/cache/**

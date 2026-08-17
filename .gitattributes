@@ -1,0 +1,11 @@
+config/*.json -text
+results/*.csv -text
+results/**/*.csv -text
+results/**/MANIFEST*.sha256 -text
+results/**/*.md -text
+results/**/*.json -text
+results/**/*.py -text
+# The results tree is hash-verified, so NO file in it may have its bytes rewritten by
+# git. A per-extension list is a list that will eventually miss one -- it already did:
+# a .txt receipt slipped through and failed verification in a fresh clone.
+results/** -text

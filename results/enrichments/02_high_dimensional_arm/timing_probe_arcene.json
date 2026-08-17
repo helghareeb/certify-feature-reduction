@@ -1,0 +1,26 @@
+{
+  "dataset": "arcene",
+  "n": 200,
+  "p": 10000,
+  "prevalence": 0.44,
+  "train_rows": 160,
+  "rankings_s": {
+    "mutual_info": 13.53,
+    "rf_importance": 2.72,
+    "l1_logistic": 3.28
+  },
+  "fit_s": {
+    "logistic_k10000": 1.89,
+    "logistic_k4": 0.01,
+    "rf_k10000": 2.1,
+    "rf_k4": 0.13,
+    "gb_k10000": 11.0,
+    "gb_k4": 0.06
+  },
+  "calibrated_fit_s": {
+    "rf_isotonic": 3.4,
+    "rf_sigmoid": 3.37
+  },
+  "peak_rss_mb": 310.4,
+  "one_fold_all_ops_s": 41.49
+}

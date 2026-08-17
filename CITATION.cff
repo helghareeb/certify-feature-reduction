@@ -1,0 +1,38 @@
+cff-version: 1.2.0
+message: "If you use this code or protocol, please cite the accompanying article."
+title: "certify-feature-reduction: a pre-registered, leakage-safe protocol for certifying feature-reduced clinical risk models"
+abstract: >-
+  Research compendium for a study auditing what the conventional AUROC-based justification for
+  feature reduction misses in clinical risk modelling. Sweeps the retained-feature budget across
+  twelve public clinical datasets, three feature rankers and three learners, and certifies each
+  reduced model on calibration, selective reliability, clinical net benefit, conformal
+  informativeness and subgroup equity under a leakage-safe protocol with paired,
+  multiplicity-corrected, bootstrapped comparisons.
+authors:
+  - family-names: "El-Ghareeb"
+    given-names: "Haitham A."
+    affiliation: "Information Systems Department, Faculty of Computers and Information Sciences, Mansoura University, Mansoura, Egypt"
+    email: "helghareeb@mans.edu.eg"
+repository-code: "https://github.com/helghareeb/certify-feature-reduction"
+license: MIT
+keywords:
+  - feature selection
+  - model calibration
+  - selective prediction
+  - clinical risk prediction
+  - decision curve analysis
+  - conformal prediction
+  - algorithmic fairness
+  - reproducibility
+preferred-citation:
+  type: article
+  title: "Aggressive feature reduction degrades the selective reliability and clinical net benefit of clinical risk models"
+  authors:
+    - family-names: "El-Ghareeb"
+      given-names: "Haitham A."
+      affiliation: "Information Systems Department, Faculty of Computers and Information Sciences, Mansoura University, Mansoura, Egypt"
+  journal: "Scientific Reports"
+  year: 2026
+  notes: >-
+    Under review; citation metadata will be updated on acceptance.
+    Citation metadata will be updated on acceptance.

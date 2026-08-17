@@ -1,0 +1,17 @@
+{
+  "pooled_rho": 0.4021621391104244,
+  "unweighted_mean_rho": 0.26729916008731425,
+  "spearman_n_vs_rho": [
+    -0.084,
+    0.7954
+  ],
+  "spearman_n_vs_absrho": [
+    -0.378,
+    0.2262
+  ],
+  "spearman_n_vs_penalty_d": [
+    0.056,
+    0.8629
+  ],
+  "verdict": "no_n_trend"
+}

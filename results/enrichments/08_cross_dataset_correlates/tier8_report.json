@@ -1,0 +1,144 @@
+{
+  "n_datasets": 12,
+  "aggressive_budget": "frac=0.25",
+  "correlations": {
+    "harm_auroc": {
+      "n": {
+        "rho": 0.049,
+        "p": 0.8799,
+        "ci95": [
+          -0.622,
+          0.642
+        ],
+        "lodo_min": -0.173,
+        "lodo_max": 0.227
+      },
+      "p": {
+        "rho": -0.498,
+        "p": 0.0992,
+        "ci95": [
+          -0.863,
+          0.206
+        ],
+        "lodo_min": -0.621,
+        "lodo_max": -0.356
+      },
+      "n_over_p": {
+        "rho": 0.301,
+        "p": 0.3423,
+        "ci95": [
+          -0.408,
+          0.794
+        ],
+        "lodo_min": 0.155,
+        "lodo_max": 0.455
+      },
+      "prevalence": {
+        "rho": 0.028,
+        "p": 0.9312,
+        "ci95": [
+          -0.578,
+          0.671
+        ],
+        "lodo_min": -0.145,
+        "lodo_max": 0.218
+      },
+      "retained_k_aggr": {
+        "rho": -0.577,
+        "p": 0.0497,
+        "ci95": [
+          -0.897,
+          0.063
+        ],
+        "lodo_min": -0.701,
+        "lodo_max": -0.45
+      }
+    },
+    "harm_aurc": {
+      "n": {
+        "rho": 0.224,
+        "p": 0.4845,
+        "ci95": [
+          -0.489,
+          0.743
+        ],
+        "lodo_min": 0.027,
+        "lodo_max": 0.382
+      },
+      "p": {
+        "rho": -0.709,
+        "p": 0.0099,
+        "ci95": [
+          -0.957,
+          -0.164
+        ],
+        "lodo_min": -0.829,
+        "lodo_max": -0.621
+      },
+      "n_over_p": {
+        "rho": 0.448,
+        "p": 0.1446,
+        "ci95": [
+          -0.269,
+          0.905
+        ],
+        "lodo_min": 0.282,
+        "lodo_max": 0.645
+      },
+      "prevalence": {
+        "rho": 0.168,
+        "p": 0.6021,
+        "ci95": [
+          -0.504,
+          0.808
+        ],
+        "lodo_min": 0.055,
+        "lodo_max": 0.518
+      },
+      "retained_k_aggr": {
+        "rho": -0.779,
+        "p": 0.0028,
+        "ci95": [
+          -0.976,
+          -0.31
+        ],
+        "lodo_min": -0.878,
+        "lodo_max": -0.712
+      }
+    }
+  },
+  "partials": {
+    "harm_auroc": {
+      "harm_vs_n_control_p": {
+        "rho": -0.256,
+        "p": 0.4467
+      },
+      "harm_vs_p_control_n": {
+        "rho": -0.544,
+        "p": 0.0836
+      },
+      "harm_vs_n_control_k": {
+        "rho": -0.301,
+        "p": 0.3688
+      }
+    },
+    "harm_aurc": {
+      "harm_vs_n_control_p": {
+        "rho": -0.198,
+        "p": 0.5596
+      },
+      "harm_vs_p_control_n": {
+        "rho": -0.705,
+        "p": 0.0154
+      },
+      "harm_vs_n_control_k": {
+        "rho": -0.247,
+        "p": 0.4649
+      }
+    }
+  },
+  "highdim_block": {
+    "n_datasets": 2,
+    "note": "aggressive=k:1; NOT pooled with clinical"
+  }
+}

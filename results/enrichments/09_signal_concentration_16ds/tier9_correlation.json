@@ -1,0 +1,36 @@
+{
+  "n_datasets": 16,
+  "mutual_info": {
+    "n": 16,
+    "rho": 0.091,
+    "p": 0.737,
+    "ci95": [
+      -0.492,
+      0.611
+    ],
+    "partial_ctrl_p": 0.009,
+    "partial_ctrl_k": -0.163
+  },
+  "rf_importance": {
+    "n": 16,
+    "rho": 0.15,
+    "p": 0.5792,
+    "ci95": [
+      -0.463,
+      0.6
+    ],
+    "partial_ctrl_p": -0.031,
+    "partial_ctrl_k": 0.02
+  },
+  "l1_logistic": {
+    "n": 16,
+    "rho": 0.115,
+    "p": 0.6723,
+    "ci95": [
+      -0.481,
+      0.58
+    ],
+    "partial_ctrl_p": -0.04,
+    "partial_ctrl_k": -0.103
+  }
+}

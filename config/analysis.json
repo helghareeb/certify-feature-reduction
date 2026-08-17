@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0.0",
+  "note": "Presentation-layer parameters for the R1.3 worked example. Deliberately SEPARATE from calibration.json: these choices select and display cached model outputs (they change no model output), so moving a threshold must never invalidate or re-burn the grid. The threshold and cell were fixed a priori, before any flip count was computed; the selection rule is stated in the manuscript.",
+  "worked_example": {
+    "dataset": "mammographic",
+    "cell": {"method": "mutual_info", "classifier": "logistic", "calibrate": "none"},
+    "budget_full": "frac:1",
+    "budget_reduced": "frac:0.25",
+    "threshold": 0.10,
+    "threshold_rationale": "a ~10% malignancy risk is the conventional BI-RADS 4b boundary at which biopsy is recommended; inside the paper's evaluated 0.05-0.5 decision-curve band",
+    "sensitivity_thresholds": [0.05, 0.15],
+    "n_exemplar_patients": 8
+  },
+  "secondary_example": {
+    "dataset": "diabetes130",
+    "cell": {"method": "mutual_info", "classifier": "logistic", "calibrate": "none"},
+    "budget_full": "frac:1",
+    "budget_reduced": "frac:0.25",
+    "threshold": 0.10,
+    "threshold_rationale": "readmission-prevention program enrollment decisions operate near the cohort prevalence (0.112); net benefit for both arms approaches zero above t~0.3 at this prevalence, so higher thresholds are uninformative",
+    "sensitivity_thresholds": [0.05, 0.15]
+  }
+}

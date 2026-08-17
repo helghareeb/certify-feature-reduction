@@ -1,0 +1,342 @@
+{
+  "outcome": "aurc",
+  "frac_min": 0.25,
+  "retained_k_table": {
+    "bcw": {
+      "0.25": 2,
+      "0.33": 3,
+      "0.5": 4,
+      "0.75": 7,
+      "1.0": 9
+    },
+    "cleveland": {
+      "0.25": 3,
+      "0.33": 4,
+      "0.5": 6,
+      "0.75": 9,
+      "1.0": 12
+    },
+    "diabetes130": {
+      "0.25": 4,
+      "0.33": 5,
+      "0.5": 8,
+      "0.75": 12,
+      "1.0": 16
+    },
+    "haberman": {
+      "0.25": 1,
+      "0.33": 1,
+      "0.5": 2,
+      "0.75": 2,
+      "1.0": 3
+    },
+    "heartfailure": {
+      "0.25": 3,
+      "0.33": 4,
+      "0.5": 6,
+      "0.75": 8,
+      "1.0": 11
+    },
+    "hepatitis": {
+      "0.25": 4,
+      "0.33": 6,
+      "0.5": 9,
+      "0.75": 14,
+      "1.0": 18
+    },
+    "ilpd": {
+      "0.25": 2,
+      "0.33": 3,
+      "0.5": 4,
+      "0.75": 7,
+      "1.0": 9
+    },
+    "mammographic": {
+      "0.25": 1,
+      "0.33": 2,
+      "0.5": 2,
+      "0.75": 4,
+      "1.0": 5
+    },
+    "pima": {
+      "0.25": 2,
+      "0.33": 3,
+      "0.5": 4,
+      "0.75": 6,
+      "1.0": 8
+    },
+    "spectf": {
+      "0.25": 11,
+      "0.33": 15,
+      "0.5": 22,
+      "0.75": 33,
+      "1.0": 44
+    },
+    "statlogheart": {
+      "0.25": 3,
+      "0.33": 4,
+      "0.5": 6,
+      "0.75": 9,
+      "1.0": 12
+    },
+    "wdbc": {
+      "0.25": 8,
+      "0.33": 10,
+      "0.5": 15,
+      "0.75": 22,
+      "1.0": 30
+    }
+  },
+  "harm_by_dataset": {
+    "mammographic": {
+      "harm": 0.0702,
+      "p": 5,
+      "k_min": 1,
+      "hits_k1": true
+    },
+    "statlogheart": {
+      "harm": 0.0682,
+      "p": 12,
+      "k_min": 3,
+      "hits_k1": false
+    },
+    "haberman": {
+      "harm": 0.0602,
+      "p": 3,
+      "k_min": 1,
+      "hits_k1": true
+    },
+    "cleveland": {
+      "harm": 0.0545,
+      "p": 12,
+      "k_min": 3,
+      "hits_k1": false
+    },
+    "ilpd": {
+      "harm": 0.0372,
+      "p": 9,
+      "k_min": 2,
+      "hits_k1": false
+    },
+    "pima": {
+      "harm": 0.0291,
+      "p": 8,
+      "k_min": 2,
+      "hits_k1": false
+    },
+    "bcw": {
+      "harm": 0.021,
+      "p": 9,
+      "k_min": 2,
+      "hits_k1": false
+    },
+    "hepatitis": {
+      "harm": 0.0196,
+      "p": 18,
+      "k_min": 4,
+      "hits_k1": false
+    },
+    "diabetes130": {
+      "harm": 0.0081,
+      "p": 16,
+      "k_min": 4,
+      "hits_k1": false
+    },
+    "heartfailure": {
+      "harm": 0.0081,
+      "p": 11,
+      "k_min": 3,
+      "hits_k1": false
+    },
+    "wdbc": {
+      "harm": 0.0029,
+      "p": 30,
+      "k_min": 8,
+      "hits_k1": false
+    },
+    "spectf": {
+      "harm": 0.0019,
+      "p": 44,
+      "k_min": 11,
+      "hits_k1": false
+    }
+  },
+  "correlations": {
+    "p_vs_harm": {
+      "rho": -0.709,
+      "p": 0.0099
+    },
+    "k_min_vs_harm": {
+      "rho": -0.779,
+      "p": 0.0028
+    },
+    "log2_k_min_vs_harm": {
+      "rho": -0.779,
+      "p": 0.0028
+    },
+    "hits_k1_vs_harm": {
+      "rho": 0.583,
+      "p": 0.0467
+    },
+    "p_vs_harm_excl_floor": {
+      "rho": -0.585,
+      "p": 0.0754
+    },
+    "n_excl_floor": 10,
+    "robustness": {
+      "p_vs_harm": {
+        "lodo": {
+          "mammographic": -0.639,
+          "statlogheart": -0.829,
+          "haberman": -0.69,
+          "cleveland": -0.774,
+          "ilpd": -0.729,
+          "pima": -0.726,
+          "bcw": -0.72,
+          "hepatitis": -0.667,
+          "diabetes130": -0.667,
+          "heartfailure": -0.776,
+          "wdbc": -0.621,
+          "spectf": -0.621
+        },
+        "lodo_range": [
+          -0.829,
+          -0.621
+        ],
+        "lodo_all_negative": true,
+        "bootstrap_ci95": [
+          -0.957,
+          -0.162
+        ],
+        "bootstrap_n_valid": 5000
+      },
+      "k_min_vs_harm": {
+        "lodo": {
+          "mammographic": -0.719,
+          "statlogheart": -0.878,
+          "haberman": -0.766,
+          "cleveland": -0.832,
+          "ilpd": -0.804,
+          "pima": -0.804,
+          "bcw": -0.804,
+          "hepatitis": -0.743,
+          "diabetes130": -0.743,
+          "heartfailure": -0.799,
+          "wdbc": -0.712,
+          "spectf": -0.712
+        },
+        "lodo_range": [
+          -0.878,
+          -0.712
+        ],
+        "lodo_all_negative": true,
+        "bootstrap_ci95": [
+          -0.976,
+          -0.316
+        ],
+        "bootstrap_n_valid": 5000
+      }
+    }
+  },
+  "matched_k_harm": {
+    "1": {
+      "bcw": 0.031,
+      "cleveland": 0.178,
+      "diabetes130": 0.0269,
+      "haberman": 0.0602,
+      "heartfailure": 0.0514,
+      "hepatitis": 0.0478,
+      "ilpd": 0.0606,
+      "mammographic": 0.0702,
+      "pima": 0.0586,
+      "spectf": 0.0353,
+      "statlogheart": 0.1911,
+      "wdbc": 0.0298
+    },
+    "2": {
+      "bcw": 0.021,
+      "cleveland": 0.0843,
+      "diabetes130": 0.014,
+      "haberman": 0.0168,
+      "heartfailure": 0.0314,
+      "hepatitis": 0.0308,
+      "ilpd": 0.0372,
+      "mammographic": 0.029,
+      "pima": 0.0291,
+      "spectf": 0.0262,
+      "statlogheart": 0.0958,
+      "wdbc": 0.0179
+    },
+    "3": {
+      "bcw": 0.0083,
+      "cleveland": 0.0545,
+      "heartfailure": 0.0081,
+      "ilpd": 0.0213,
+      "pima": 0.0139,
+      "statlogheart": 0.0682
+    },
+    "4": {
+      "bcw": 0.0031,
+      "cleveland": 0.0333,
+      "diabetes130": 0.0081,
+      "heartfailure": 0.0049,
+      "hepatitis": 0.0196,
+      "ilpd": 0.0123,
+      "mammographic": 0.0003,
+      "pima": 0.0082,
+      "spectf": 0.014,
+      "statlogheart": 0.0398,
+      "wdbc": 0.0069
+    },
+    "6": {
+      "cleveland": 0.01,
+      "heartfailure": 0.0008,
+      "hepatitis": 0.0145,
+      "pima": 0.0025,
+      "statlogheart": 0.0165
+    },
+    "7": {
+      "bcw": 0.0001,
+      "ilpd": -0.0004
+    },
+    "8": {
+      "bcw": -0.0001,
+      "cleveland": 0.0056,
+      "diabetes130": 0.0032,
+      "heartfailure": -0.0002,
+      "hepatitis": 0.0078,
+      "ilpd": -0.0009,
+      "spectf": 0.0044,
+      "statlogheart": 0.0071,
+      "wdbc": 0.0029
+    },
+    "9": {
+      "cleveland": 0.0044,
+      "hepatitis": 0.0059,
+      "statlogheart": 0.0059
+    },
+    "15": {
+      "spectf": -0.0003,
+      "wdbc": 0.0007
+    },
+    "22": {
+      "spectf": -0.0011,
+      "wdbc": -0.0002
+    }
+  },
+  "exact_k1_harm": {
+    "bcw": 0.031,
+    "cleveland": 0.178,
+    "diabetes130": 0.0269,
+    "haberman": 0.0602,
+    "heartfailure": 0.0514,
+    "hepatitis": 0.0478,
+    "ilpd": 0.0606,
+    "mammographic": 0.0702,
+    "pima": 0.0586,
+    "spectf": 0.0353,
+    "statlogheart": 0.1911,
+    "wdbc": 0.0298
+  },
+  "note": "k derives deterministically from (frac, p) via reduction.retained_k -- identical to the k_features the runner logs per raw row."
+}

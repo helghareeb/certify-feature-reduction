@@ -1,0 +1,18 @@
+{
+  "n_comparisons": 45,
+  "ci_overlap": 7,
+  "sign_agree": 27,
+  "sign_reversals": 18,
+  "verdict_agree": 25,
+  "verdict_full_only_material": 12,
+  "verdict_6k_only_material": 8,
+  "max_abs_delta_gap": 0.0554,
+  "median_abs_delta_gap": 0.0037,
+  "largest_sign_reversal": {
+    "method": "mutual_info",
+    "classifier": "rf",
+    "outcome": "auroc",
+    "delta_full": 0.0278,
+    "delta_6k": -0.0276
+  }
+}

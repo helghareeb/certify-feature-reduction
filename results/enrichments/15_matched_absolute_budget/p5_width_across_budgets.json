@@ -1,0 +1,38 @@
+{
+  "panel": "clinical only (never pooled with high-dim)",
+  "harm": "AUROC(full) - AUROC(reduced-to-k)",
+  "results": [
+    {
+      "budget_k": 1,
+      "n_datasets": 12,
+      "spearman_rho": 0.323,
+      "p_value": 0.3061,
+      "boot_ci_lo": -0.304,
+      "boot_ci_hi": 0.712
+    },
+    {
+      "budget_k": 2,
+      "n_datasets": 12,
+      "spearman_rho": 0.6,
+      "p_value": 0.0392,
+      "boot_ci_lo": 0.015,
+      "boot_ci_hi": 0.915
+    },
+    {
+      "budget_k": 4,
+      "n_datasets": 11,
+      "spearman_rho": 0.685,
+      "p_value": 0.02,
+      "boot_ci_lo": 0.108,
+      "boot_ci_hi": 0.971
+    },
+    {
+      "budget_k": 8,
+      "n_datasets": 9,
+      "spearman_rho": 0.765,
+      "p_value": 0.0164,
+      "boot_ci_lo": 0.175,
+      "boot_ci_hi": 0.996
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0.0",
+  "RANDOM_SEED": 20260626,
+  "REPS": 30,
+  "datasets": [
+    "cleveland",
+    "pima",
+    "ilpd",
+    "heartfailure",
+    "wdbc",
+    "statlogheart",
+    "haberman",
+    "hepatitis",
+    "mammographic",
+    "bcw",
+    "spectf",
+    "diabetes130"
+  ],
+  "reduction_methods": [
+    "mutual_info"
+  ],
+  "classifiers": [
+    "logistic",
+    "rf",
+    "gb"
+  ],
+  "fracs": [
+    1.0,
+    0.25
+  ],
+  "reference_frac": 1.0,
+  "n_folds": 5,
+  "outcomes": [
+    "accuracy",
+    "auroc",
+    "brier",
+    "ece",
+    "aurc",
+    "auroc_gap",
+    "ece_gap",
+    "net_benefit",
+    "net_benefit_gap",
+    "conformal_efficiency",
+    "conformal_coverage_gap",
+    "selective_ece"
+  ],
+  "bootstrap_resamples": 5000,
+  "bootstrap_alpha": 0.05,
+  "stat_alpha": 0.05,
+  "calibrations": [
+    "none",
+    "sigmoid",
+    "isotonic"
+  ],
+  "note": "recalibration-depth control: none vs Platt(sigmoid) vs isotonic, leakage-safe inner CV, full vs 25% budgets"
+}

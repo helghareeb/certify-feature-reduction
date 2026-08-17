@@ -1,0 +1,16 @@
+{
+  "n_rows_small": 5265,
+  "max_drift_rf_gb_metrics": 1.1102230246251565e-16,
+  "max_drift_rf_gb_pvalues": 1.6940658945086007e-21,
+  "max_drift_rf_gb": 1.1102230246251565e-16,
+  "max_drift_logistic_metrics": 5.118866005590639e-05,
+  "max_drift_logistic_pvalues": 0.0038848370313645034,
+  "max_drift_logistic": 0.0038848370313645034,
+  "verdict_mismatch_material": 0,
+  "verdict_mismatch_material_worse": 0,
+  "verdict_mismatch_material_better": 0,
+  "diabetes130_rows": 540,
+  "diabetes130_mean_abs_delta_change": 0.00966,
+  "verdict": "PASS",
+  "failures": []
+}

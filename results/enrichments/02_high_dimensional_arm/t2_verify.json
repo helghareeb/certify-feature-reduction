@@ -1,0 +1,69 @@
+[
+  {
+    "name": "arcene",
+    "file": "arcene.mat",
+    "n": 200,
+    "p": 10000,
+    "classes": 2,
+    "balance": "-1:112/1:88",
+    "bytes": 1900005,
+    "sha256": "779d678207b9a8c0ba8f2f5ecdb2216d9f98bf475ab040e806797efd36331bc5"
+  },
+  {
+    "name": "SMK-CAN-187",
+    "file": "SMK-CAN-187.mat",
+    "n": 187,
+    "p": 19993,
+    "classes": 2,
+    "balance": "1:90/2:97",
+    "bytes": 11861244,
+    "sha256": "96ff62a9dad001b4bb28a5c31f69e9c41fb1f42d02e4b39c31e4a57b46238aa7"
+  },
+  {
+    "name": "GLI-85",
+    "file": "GLI-85.mat",
+    "n": 85,
+    "p": 22283,
+    "classes": 2,
+    "balance": "1:26/2:59",
+    "bytes": 8743262,
+    "sha256": "c1170b0b7ef8dc8e5d4982deb179da81035c766a5c2b74aff55270d65007b57a"
+  },
+  {
+    "name": "ALLAML",
+    "file": "ALLAML.mat",
+    "n": 72,
+    "p": 7129,
+    "classes": 2,
+    "balance": "1:47/2:25",
+    "bytes": 3639219,
+    "sha256": "068afe0fe1021932e1e7d801294c267de8aeaa9d41899acfac024e72b0d44c1e"
+  },
+  {
+    "name": "Prostate-GE",
+    "file": "Prostate-GE.mat",
+    "n": 102,
+    "p": 5966,
+    "classes": 2,
+    "balance": "1:50/2:52",
+    "bytes": 1524983,
+    "sha256": "050b598534dbc662f23e30f39b41354b61d02ab8567837bcf9b1091c1c636ab4"
+  },
+  {
+    "name": "colon",
+    "file": "colon.mat",
+    "n": 62,
+    "p": 2000,
+    "classes": 2,
+    "balance": "-1:40/1:22",
+    "bytes": 36319,
+    "sha256": "ffcdeba03eb67cec403fa1dc9f827c22a6e2c57786bf3e01dfe1b4b3e25e0a2f"
+  },
+  {
+    "name": "arcene_uci_cleanlicence",
+    "file": "arcene_uci.zip",
+    "bytes": 8648477,
+    "sha256": "c7a40e39edf23a9b744eb570592d6e917fd9a1976aaf20ad581e09afd47d5220",
+    "note": "UCI CC BY 4.0 clean-licence source zip (multi-file split; parse on use)"
+  }
+]

@@ -1,0 +1,84 @@
+{
+  "bcw": {
+    "breast-cancer-wisconsin.data": {
+      "bytes": 19889,
+      "sha256": "402c585309c399237740f635ef9919dc512cca12cbeb20de5e563a4593f22b64",
+      "url": "https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/breast-cancer-wisconsin.data"
+    }
+  },
+  "cleveland": {
+    "processed.cleveland.data": {
+      "bytes": 18461,
+      "sha256": "a74b7efa387bc9d108d7d0115d831fe9b414b29ae7124f331b622b4efa0427c8",
+      "url": "https://archive.ics.uci.edu/ml/machine-learning-databases/heart-disease/processed.cleveland.data"
+    }
+  },
+  "diabetes130": {
+    "dataset_diabetes.zip": {
+      "bytes": 3347213,
+      "sha256": "66d9820c3bd5fd2abf7957bda2d9714b2de1e7bba1ac1f1ff8fa85e83c22cb33",
+      "url": "https://archive.ics.uci.edu/ml/machine-learning-databases/00296/dataset_diabetes.zip"
+    }
+  },
+  "haberman": {
+    "haberman.data": {
+      "bytes": 3103,
+      "sha256": "b4b7a32586a5668f9f4d6dc8be9d1bc8cd4822523affb1f6b5bfc350681ef3e2",
+      "url": "https://archive.ics.uci.edu/ml/machine-learning-databases/haberman/haberman.data"
+    }
+  },
+  "heartfailure": {
+    "heartfailure.csv": {
+      "bytes": 12239,
+      "sha256": "9c73cea7468ff5d517801ec050fe9993da5912fce4b56f296f8df3b38dd75912",
+      "url": "https://archive.ics.uci.edu/ml/machine-learning-databases/00519/heart_failure_clinical_records_dataset.csv"
+    }
+  },
+  "hepatitis": {
+    "hepatitis.data": {
+      "bytes": 7545,
+      "sha256": "9971f9d18abb4fc9dd6749eefb0f864b36fa7bdd59f54188c0b148a5c28214bc",
+      "url": "https://archive.ics.uci.edu/ml/machine-learning-databases/hepatitis/hepatitis.data"
+    }
+  },
+  "ilpd": {
+    "ilpd.csv": {
+      "bytes": 23755,
+      "sha256": "84feac16488de5cf89bd22bd802c77f25841fe93e9ddd32355683e94d46c3425",
+      "url": "https://archive.ics.uci.edu/ml/machine-learning-databases/00225/Indian%20Liver%20Patient%20Dataset%20(ILPD).csv"
+    }
+  },
+  "mammographic": {
+    "mammographic_masses.data": {
+      "bytes": 13450,
+      "sha256": "072051c896fb14f8f25c64eed30ba1333290af41e6c9ffad4e1ca573daa865a8",
+      "url": "https://archive.ics.uci.edu/ml/machine-learning-databases/mammographic-masses/mammographic_masses.data"
+    }
+  },
+  "pima": {
+    "pima.csv": {
+      "bytes": 23278,
+      "sha256": "6bfe5d0f379d17a0e0819b996407e3c09bf80febd4287f2ed212190dfff154af",
+      "url": "https://raw.githubusercontent.com/jbrownlee/Datasets/master/pima-indians-diabetes.data.csv"
+    }
+  },
+  "spectf": {
+    "SPECTF.test": {
+      "bytes": 33459,
+      "sha256": "467a65c81e14a71c029fa58bf9350ecdf28ff072303b99a832e8606e193a3882",
+      "url": "https://archive.ics.uci.edu/ml/machine-learning-databases/spect/SPECTF.test"
+    },
+    "SPECTF.train": {
+      "bytes": 10797,
+      "sha256": "9c837e4fd4b7931d9be5304989e39f284f35f767518ffd4dfd42a6a519a9f30c",
+      "url": "https://archive.ics.uci.edu/ml/machine-learning-databases/spect/SPECTF.train"
+    }
+  },
+  "statlogheart": {
+    "heart.dat": {
+      "bytes": 16461,
+      "sha256": "f5f3b4204c285bafadd85cb735f38b47689f2be7047feb172dcbeab648110bf9",
+      "url": "https://archive.ics.uci.edu/ml/machine-learning-databases/statlog/heart/heart.dat"
+    }
+  }
+}

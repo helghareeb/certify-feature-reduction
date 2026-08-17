@@ -1,0 +1,10 @@
+{
+  "n_cells_total": 9720,
+  "mean_ece": {
+    "isotonic": 0.0501,
+    "none": 0.0694,
+    "sigmoid": 0.0542
+  },
+  "ece_recovery_sigmoid": 0.0152,
+  "ece_recovery_isotonic": 0.0193
+}

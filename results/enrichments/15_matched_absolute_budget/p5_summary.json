@@ -1,0 +1,10 @@
+{
+  "spearman_p_vs_harm_k8_all": [
+    0.598,
+    0.0309
+  ],
+  "spearman_p_vs_harm_k8_clinical": [
+    0.765,
+    0.0164
+  ]
+}

@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nsclinfs"
+version = "0.1.0"
+description = "Calibration and subgroup-fairness audit under aggressive feature reduction on clinical tabular data"
+requires-python = ">=3.10"
+dependencies = ["numpy", "pandas", "scipy", "scikit-learn", "statsmodels"]
+
+[tool.setuptools.packages.find]
+where = ["src"]

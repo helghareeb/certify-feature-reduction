@@ -1,0 +1,14 @@
+dataset,block,p,harm_auroc_k8
+bcw,clinical,9,-0.0001
+ilpd,clinical,9,-0.0015
+heartfailure,clinical,11,-0.001
+cleveland,clinical,12,0.0054
+statlogheart,clinical,12,0.0081
+diabetes130,clinical,16,0.0095
+hepatitis,clinical,18,0.0199
+wdbc,clinical,30,0.0051
+spectf,clinical,44,0.0124
+arrhythmia,highdim,279,0.0825
+prostate_ge,highdim,5966,-0.0065
+arcene,highdim,10000,0.1569
+gli85,highdim,22283,0.0336

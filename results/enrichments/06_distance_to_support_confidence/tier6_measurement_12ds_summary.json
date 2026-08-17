@@ -1,0 +1,9 @@
+{
+  "n_cells": 2160,
+  "n_datasets": 12,
+  "mean_penalty_margin": 0.033447806627985036,
+  "mean_penalty_d": 0.011631497934562217,
+  "survival_ratio": 0.34775069301047684,
+  "wilcoxon_p": 7.15752746648497e-103,
+  "verdict": "shrinks_materially"
+}
