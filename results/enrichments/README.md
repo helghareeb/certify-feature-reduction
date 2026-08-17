@@ -34,6 +34,14 @@ Results that came out against the hypothesis that motivated them are marked 🔻
 | `18_decision_flip_decomposition` | Which way do the decision flips go, and does that depend on the threshold? | Both, and it matters: at the pre-registered $10\,\%$ biopsy threshold 188 of 203 flips are *new* referrals, not withdrawals, and the direction inverts by $t=0.30$ where 93 malignant patients lose a biopsy recommendation. The reduced model emits 29 distinct risks against the full model's 846, which is what sets the direction | Worked example |
 | `19_dataset_level_inference` | Do the headline claims survive a test that assumes nothing about repetition count? | Yes for five axes, no for two: an exact sign test over the twelve dataset means gives 12/12 for selective reliability and discrimination ($p=0.0002$), 11/12 for net benefit, conformal set size and Brier, and 8/12 for the two calibration axes ($p=0.19$) --- the same split the cell counts give | Results, Statistics |
 
+## Verified continuously, not once
+
+Each folder's `MANIFEST.sha256` and the tree-level `results/MANIFEST.sha256` are checked on every
+push by [`.github/workflows/verify.yml`](../../.github/workflows/verify.yml), together with the
+provenance gate that refuses a committed result with no committed code behind it. The workflow also
+regenerates the worked clinical example from the committed caches and asserts its published values,
+so the number a reader is most likely to check cannot drift silently.
+
 ## How to read these folders
 
 - `*.csv` — the numbers. Every committed column is declared in `paper/MANIFEST.toml`, either as cited
