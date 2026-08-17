@@ -2,9 +2,10 @@
 
 **Research compendium — everything behind the paper, and enough to disagree with it.**
 
+[![verify](https://github.com/helghareeb/certify-feature-reduction/actions/workflows/verify.yml/badge.svg)](https://github.com/helghareeb/certify-feature-reduction/actions/workflows/verify.yml)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21978878.svg)](https://doi.org/10.5281/zenodo.21978878)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](pyproject.toml)
-[![Tests](https://img.shields.io/badge/tests-27%20passing-brightgreen.svg)](tests/)
 [![Reproducible](https://img.shields.io/badge/numbers-regenerate%20from%20seed-brightgreen.svg)](#reproducibility)
 [![Pre-registered](https://img.shields.io/badge/pre--registered-with%20dated%20addendum-blue.svg)](docs/PRE_REGISTRATION.md)
 [![Status](https://img.shields.io/badge/status-under%20review-orange.svg)](#the-paper)
@@ -28,6 +29,37 @@ This repository is public at a reviewer's request, so that every number in the m
 checked against the code and the results that produced it. The manuscript itself is not distributed
 here; `paper/` holds only the generated figures and the table fragments it includes, so that a
 rebuild can be compared against the numbers as typeset.
+
+## Check something in two minutes
+
+You do not have to run the study to test it. In order of effort:
+
+```bash
+git clone https://github.com/helghareeb/certify-feature-reduction && cd certify-feature-reduction
+
+# 1. Do the committed results still hash to what the manifest says? (seconds, no dependencies)
+python scripts/make_results_manifest.py --check
+
+# 2. Does every committed result have committed code that produced it? (seconds)
+python scripts/provenance_map.py --check
+
+# 3. Read the headline off the canonical aggregate: 108 cells, 94 materially worse on AURC
+python -c "import pandas as pd; d=pd.read_csv('results/summary.csv',comment='#'); \
+c=d[(d.frac==0.25)&(d.outcome=='aurc')&(d.calibrate=='none')]; \
+print(len(c),'cells,',int(c.material_worse.sum()),'materially worse')"
+
+# 4. Regenerate the paper's most quotable number from the committed caches (a minute)
+pip install -r requirements.lock.txt
+PYTHONPATH=src python experiments/worked_example.py
+# -> 961 patients, 203 biopsy decisions moved (21.1 %), 4 malignant cases moved off biopsy
+```
+
+Steps 1-3 need no dependencies beyond pandas. Every one of them runs in
+[CI](.github/workflows/verify.yml) on each push, so the badge above is a claim about this commit
+rather than about the day someone last checked.
+
+If a number here does not match the paper, that is a bug and worth reporting — see
+[§5 of REPRODUCE.md](REPRODUCE.md).
 
 ## What the study asks
 

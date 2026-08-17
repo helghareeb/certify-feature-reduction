@@ -1,0 +1,31 @@
+{
+  "title": "Code and results for \"Aggressive feature reduction degrades the selective reliability and clinical net benefit of clinical risk models\"",
+  "upload_type": "software",
+  "license": "mit-license",
+  "access_right": "open",
+  "language": "eng",
+  "creators": [
+    {
+      "name": "El-Ghareeb, Haitham A.",
+      "affiliation": "Faculty of Computers and Information Sciences, Mansoura University",
+      "orcid": "0000-0003-1875-6706"
+    }
+  ],
+  "description": "Research compendium for a pre-registered, leakage-safe audit of what aggressive feature reduction costs clinical risk models beyond discrimination: calibration, selective (risk-coverage) reliability, clinical net benefit, conformal informativeness and between-subgroup equity, across twelve public clinical datasets, three rankers, three learners, fractional budgets from 100% to 25%, and matched exact-k budgets. Includes the analysis library, the experiment drivers, the hash-pinned calibration configurations, the pre-registration with a dated addendum, the committed per-configuration result summaries, the out-of-fold caches from which the worked clinical examples are computed, and twenty-four enrichment experiments each with its own hash manifest and producing code. Negative results and pre-specifications are included and marked as such. Every reported number regenerates from committed code, a committed configuration and a recorded seed.",
+  "keywords": [
+    "feature selection",
+    "feature reduction",
+    "calibration",
+    "selective prediction",
+    "risk-coverage curve",
+    "clinical risk prediction",
+    "decision curve analysis",
+    "net benefit",
+    "conformal prediction",
+    "algorithmic fairness",
+    "subgroup equity",
+    "reproducibility",
+    "pre-registration",
+    "clinical decision support"
+  ]
+}
