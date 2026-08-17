@@ -1,0 +1,70 @@
+{
+  "worked_example": {
+    "dataset": "mammographic",
+    "cell": {
+      "method": "mutual_info",
+      "classifier": "logistic",
+      "calibrate": "none"
+    },
+    "threshold_preregistered": 0.1,
+    "prevalence": 0.4631,
+    "risk_percentiles_full": {
+      "p10": 0.045,
+      "p25": 0.1054,
+      "p50": 0.4553,
+      "p75": 0.8192,
+      "p90": 0.9109
+    },
+    "risk_percentiles_reduced": {
+      "p10": 0.2702,
+      "p25": 0.2833,
+      "p50": 0.2991,
+      "p75": 0.7799,
+      "p90": 0.8007
+    },
+    "resolution_full": {
+      "distinct_mean": 845.6,
+      "distinct_min": 830,
+      "distinct_max": 857
+    },
+    "resolution_reduced": {
+      "distinct_mean": 28.6,
+      "distinct_min": 26,
+      "distinct_max": 30
+    }
+  },
+  "secondary_example": {
+    "dataset": "diabetes130",
+    "cell": {
+      "method": "mutual_info",
+      "classifier": "logistic",
+      "calibrate": "none"
+    },
+    "threshold_preregistered": 0.1,
+    "prevalence": 0.1116,
+    "risk_percentiles_full": {
+      "p10": 0.0702,
+      "p25": 0.0808,
+      "p50": 0.0968,
+      "p75": 0.1224,
+      "p90": 0.1631
+    },
+    "risk_percentiles_reduced": {
+      "p10": 0.0746,
+      "p25": 0.0863,
+      "p50": 0.0929,
+      "p75": 0.1184,
+      "p90": 0.1551
+    },
+    "resolution_full": {
+      "distinct_mean": 66310.4,
+      "distinct_min": 66084,
+      "distinct_max": 66459
+    },
+    "resolution_reduced": {
+      "distinct_mean": 1793.8,
+      "distinct_min": 1417,
+      "distinct_max": 2160
+    }
+  }
+}

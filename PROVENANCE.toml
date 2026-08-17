@@ -229,6 +229,10 @@ columns = ["dataset", "method", "classifier", "budget", "calibrate", "rep"]
 "results/cache/poof" = "src/nsclinfs/run.py (_write_poof), driven by experiments/run_clinical_fs.py"
 "results/cache/rankings" = "experiments/ranking_stability.py"
 "results/cache" = "src/nsclinfs/run.py (per-threshold net-benefit curves), driven by experiments/run_clinical_fs.py"
+
+# Reviewer-3 round, 2026-08-17. Both cache-only; neither fits a model.
+"results/enrichments/18_decision_flip_decomposition" = "experiments/enrichments/compute_flip_decomposition.py"
+"results/enrichments/19_dataset_level_inference" = "experiments/enrichments/compute_dataset_level_inference.py"
 [not_run]  # V1 — scripts present but not exercised for this revision, declared with reasons.
 "experiments/make_graphical_abstract.py" = "graphical abstract not part of the SR revision package; not regenerated this round"
 "experiments/probe_timing.py" = "diagnostic only: measured atomic fit/ranking times to size the grid before launch (results/timing_probe.json); produces no manuscript number"

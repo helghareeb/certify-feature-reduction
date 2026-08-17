@@ -1,6 +1,6 @@
 # Enrichment experiments
 
-Twenty-two controls and extensions run for the revised manuscript, beyond the main grid in
+Twenty-four controls and extensions run for the revised manuscript, beyond the main grid in
 `results/summary*.csv`. Every folder has a row in the table below, and every folder holds its own
 `MANIFEST.sha256`.
 
@@ -30,6 +30,9 @@ Results that came out against the hypothesis that motivated them are marked 🔻
 | `15_matched_absolute_budget` | The retained count and $p$ are collinear because $k = 0.25p$. What happens at matched $k$? | Harm still rises with width at every budget from $k=2$ up ($\rho = +0.60, +0.69, +0.77$ at $k = 2, 4, 8$ on all twelve, eleven and nine qualifying datasets), so the retained-count association is partly collinearity. Not significant at $k=1$, where every dataset is harmed regardless of width | What predicts the harm |
 | `16_high_dimensional_fifth_dataset` | Does a fifth, wider dataset change the high-dimensional picture? | No, and it sharpens it: smk-can-187 ($p=19{,}993$) is *less* harmed at $k=1$ ($-0.176$) than arcene at $p=10{,}000$ ($-0.298$), so higher dimensionality is not safer. Concentration orders it differently under different rankers | High-dimensional arm |
 | `17_combined_confidence` | Can a pre-registered combination of confidence signals mitigate the surviving selective-reliability harm? | Partly, and the counter-result is reported beside it: the combination removes $48.3\,\%$ of the AURC penalty (positive on all twelve, CIs disjoint), but does **not** improve selective net benefit. 2,160 cells on the full cohort | Limitations |
+
+| `18_decision_flip_decomposition` | Which way do the decision flips go, and does that depend on the threshold? | Both, and it matters: at the pre-registered $10\,\%$ biopsy threshold 188 of 203 flips are *new* referrals, not withdrawals, and the direction inverts by $t=0.30$ where 93 malignant patients lose a biopsy recommendation. The reduced model emits 29 distinct risks against the full model's 846, which is what sets the direction | Worked example |
+| `19_dataset_level_inference` | Do the headline claims survive a test that assumes nothing about repetition count? | Yes for five axes, no for two: an exact sign test over the twelve dataset means gives 12/12 for selective reliability and discrimination ($p=0.0002$), 11/12 for net benefit, conformal set size and Brier, and 8/12 for the two calibration axes ($p=0.19$) --- the same split the cell counts give | Results, Statistics |
 
 ## How to read these folders
 
