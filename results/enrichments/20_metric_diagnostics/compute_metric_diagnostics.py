@@ -64,8 +64,7 @@ BINS = 15              # calibration bins, as in the main run
 
 # Both diagnostics summarise a Monte-Carlo distribution, so they are summarised by its standard
 # deviation and central 95 % interval rather than by its range. A range grows with the number of
-# draws and is therefore a property of how long the script ran; an interval is not. An earlier
-# draft of this arm reported ranges and they moved with the seed, which is what prompted the change.
+# draws and moves with the seed, making it a property of how the script was run; an interval is not.
 PCTL = (2.5, 97.5)
 
 
