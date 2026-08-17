@@ -15,7 +15,7 @@ authors:
     email: "helghareeb@mans.edu.eg"
 repository-code: "https://github.com/helghareeb/certify-feature-reduction"
 doi: "10.5281/zenodo.21978878"
-version: "v1.0.0"
+version: "v1.1.0"
 license: MIT
 keywords:
   - feature selection
