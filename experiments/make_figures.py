@@ -236,7 +236,10 @@ def main() -> int:
     # Defaults to the single-ranker control that Section 4.8 currently reports. Point it at
     # results/summary_recalibration_allrankers.csv once that burn lands, which is what removes
     # the single-ranker limitation the section states.
-    p.add_argument("--recal", default="results/summary_recalibration.csv")
+    # Table 9 of the manuscript is the ALL-RANKERS control (108 cells). The default pointed at the
+    # single-ranker file (36 cells) until 2026-09-22, so the documented regeneration command
+    # silently rewrote the table with the wrong numbers.
+    p.add_argument("--recal", default="results/summary_recalibration_allrankers.csv")
     a = p.parse_args()
     df = _load(a.summary)
     figures(df, a.pdf)

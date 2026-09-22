@@ -1,0 +1,5 @@
+# Embed figure text as TrueType (Type 42) subsets instead of matplotlib default Type 3 glyph
+# outlines, which render hazily in some PDF viewers and which journal production flags.
+# Numbers and layout are unchanged; only the font embedding differs. Added 2026-09-22.
+pdf.fonttype: 42
+ps.fonttype: 42
