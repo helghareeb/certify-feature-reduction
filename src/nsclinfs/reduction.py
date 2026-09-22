@@ -48,12 +48,15 @@ RANKERS = {
 def retained_k(frac: float, n_features: int) -> int:
     """The budget rule: how many features a fractional budget retains.
 
-    max(1, round(frac * p)) with Python's banker's rounding — the exact rule the v1
+    max(1, round(frac * p)) with Python's banker's rounding -- the exact rule the v1
     submission ran (formerly inline in run.py). Two properties are load-bearing and
-    deliberately preserved, not "fixed": the floor means every budget keeps >=1 feature
-    (so on p=3, the 0.33 and 0.25 budgets are the SAME one-feature model), and
-    round-half-to-even means e.g. p=5 at frac 0.5 retains 2, not 3. Both are disclosed
-    in the manuscript; changing either would silently move k for several datasets.
+    deliberately preserved, not "fixed": rounding drives the narrowest datasets to k=1
+    at the aggressive budgets (on p=3, 0.33 and 0.25 both round to 1, so those budgets
+    are the SAME one-feature model; on p=5, 0.25 rounds to 1), and round-half-to-even
+    means e.g. p=5 at frac 0.5 retains 2, not 3. The max(1, .) term is a guard only: it
+    binds when frac*p < 0.5, which no (dataset, budget) pair in the committed grid
+    reaches. Both properties are disclosed in the manuscript; changing either would
+    silently move k for several datasets.
     """
     return max(1, int(round(frac * n_features)))
 

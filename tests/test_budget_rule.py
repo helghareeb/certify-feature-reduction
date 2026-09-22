@@ -12,7 +12,7 @@ def test_retained_k_full_table():
     # dataset p -> k at fracs (1.0, 0.75, 0.5, 0.33, 0.25); verified against the v1 grid
     table = {
         3: (3, 2, 2, 1, 1),      # haberman: 0.33 and 0.25 are the SAME one-feature model
-        5: (5, 4, 2, 2, 1),      # mammographic: 0.5*5=2.5 rounds to 2 (banker's), floor at 0.25
+        5: (5, 4, 2, 2, 1),      # mammographic: 0.5*5=2.5 rounds to 2 (banker's); 0.25*5=1.25 rounds to 1 (the guard does not bind)
         8: (8, 6, 4, 3, 2),
         9: (9, 7, 4, 3, 2),      # 4.5 -> 4
         11: (11, 8, 6, 4, 3),    # 5.5 -> 6
