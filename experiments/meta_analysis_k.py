@@ -36,7 +36,7 @@ from nsclinfs.reduction import retained_k
 
 # The two datasets whose fractional ladder reaches k=1. ROUNDING does it (0.25*3 -> 0.75 -> 1;
 # 0.25*5 -> 1.25 -> 1); the max(1, .) guard never binds on the committed grid, which would need
-# frac*p < 0.5. Named "floor datasets" until round-2 review (2026-09-18) caught the misnomer.
+# frac*p < 0.5. Earlier releases called these the "floor datasets"; the name was wrong for that reason.
 # The JSON keys p_vs_harm_excl_floor / n_excl_floor are kept so results/meta_k.json is unchanged.
 K1_DATASETS = ("haberman", "mammographic")
 

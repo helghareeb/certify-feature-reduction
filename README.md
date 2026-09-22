@@ -20,7 +20,7 @@
 > Haitham A. El-Ghareeb · Information Systems Department, Faculty of Computers and Information
 > Sciences, Mansoura University, Egypt
 
-**Under review at *Scientific Reports*** — first revision submitted 17 August 2026; second revision (seven consistency corrections from the round-2 report, plus a Supplementary Information document) prepared 22 September 2026. The round-2 corrections that touch this repository — the `k=1` collapse is produced by rounding, not by the `max(1, ·)` guard, which never binds on the committed grid — are in `experiments/meta_analysis_k.py`, `src/nsclinfs/reduction.py` and `paper/meta_k_table.tex`.
+**Under review at *Scientific Reports*** — first revision submitted 17 August 2026; second revision submitted 22 September 2026. Release v1.2.1 carries the code corrections of that revision: the `k=1` collapse on the two narrowest datasets is produced by rounding, not by the `max(1, ·)` guard, which never binds on the committed grid (`experiments/meta_analysis_k.py`, `src/nsclinfs/reduction.py`, `paper/meta_k_table.tex`).
 
 Archived at Zenodo: [10.5281/zenodo.21978878](https://doi.org/10.5281/zenodo.21978878)
 (version-independent; resolves to the current release).
